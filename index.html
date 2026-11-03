@@ -9,6 +9,25 @@ main{max-width:1250px;margin:auto;padding:12px clamp(15px,3vw,40px) 42px}.main{d
 .actions{background:white;border-radius:27px;padding:clamp(20px,3vw,32px);box-shadow:0 8px 26px #6045230b;display:flex;flex-direction:column;gap:16px}
 h1{margin:0;font-size:clamp(24px,3vw,32px)}.muted{color:#657181;line-height:1.6}a{text-decoration:none}.button{display:block;padding:21px 22px;border-radius:18px;background:#ffc747;color:#332612;font-size:clamp(19px,2.2vw,23px);font-weight:900;text-align:center}.button.sub{background:#eff2f7;color:#343c52;font-size:19px}.small-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{background:#f5f7fb;padding:20px;border-radius:16px}.stat strong{display:block;font-size:26px}.stat small{color:#6b7480}.last{font-size:16px;background:#fff9e8;border-radius:12px;padding:15px;line-height:1.7}.links{display:flex;gap:20px;flex-wrap:wrap;margin-top:22px;font-size:14px;color:#586575}
 @media(max-width:780px){.main{grid-template-columns:1fr}.hero{min-height:0;flex-direction:row;gap:12px;align-items:center;padding:16px}.hero-art{flex:0 0 100px;min-height:0}.sun{font-size:60px}.name{font-size:15px}.placeholder{display:none}.speech{flex:1;padding:14px;font-size:18px}.actions{padding:19px}}@media(max-width:780px){.hero{flex-wrap:wrap}.hero .bodylab-assistant-switch{order:3;flex-basis:100%}}@media(max-width:420px){.small-actions{grid-template-columns:1fr}.hero-art{flex-basis:75px}}
+
+/* Home research dashboard */
+@media(min-width:781px){
+ .main{align-items:stretch;min-height:700px}
+ .hero,.actions{min-height:700px}
+ .hero{display:grid;grid-template-rows:minmax(0,1fr) auto auto;gap:10px}
+ .hero-art{min-height:0;height:100%}
+ .hero .bodylab-assistant-switch{margin:0;padding:0}
+ .speech{min-height:108px;max-height:132px;overflow-y:auto;display:flex;align-items:center}
+}
+.research-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.research-detail{border-radius:16px;padding:16px;background:#f5f7fb;min-width:0;display:flex;flex-direction:column;gap:7px}
+.research-detail.recommendation{background:#fff4d9}
+.research-detail .detail-title{font-weight:900;font-size:17px}
+.research-detail .detail-kicker{font-size:13px;color:#697589;font-weight:750}
+.research-detail .detail-body{font-size:15px;line-height:1.5}
+.research-detail a{color:#355d9b;font-weight:800;text-decoration:underline;text-underline-offset:2px;font-size:14px;margin-top:auto}
+@media(max-width:510px){.research-detail-grid{grid-template-columns:1fr}}
+
 </style></head><body>
 <header><div><div class="brand">☀️ BODY-LAB</div><p class="tagline">不純な動機で、健全な肉体を。</p></div><div class="sp">研究SP <span id="sp">--</span></div></header>
 <main><div class="main">
@@ -17,7 +36,11 @@ h1{margin:0;font-size:clamp(24px,3vw,32px)}.muted{color:#657181;line-height:1.6}
 <div class="stats"><div class="stat"><small id="todayLabel">今日の記録</small><strong id="today">--</strong></div><div class="stat"><small>活動日数</small><strong id="days">--</strong></div></div>
 <a class="button" href="./training.html">💪 今日のトレーニング</a>
 <div class="small-actions"><a class="button sub" href="./tree.html">🌳 研究ツリー</a><a class="button sub" href="./backup-test.html">🔐 バックアップ</a></div>
-<div class="last"><b>最新の研究記録</b><div id="latest">記録を読み込み中…</div></div>
+<div class="last"><b>最新の研究記録</b><div id="latest">記録を読み込み中…</div><div id="latestDetail" class="muted" style="font-size:14px"></div></div>
+<div class="research-detail-grid" aria-label="研究所からのおすすめ">
+ <section class="research-detail recommendation"><span class="detail-kicker">☀️ 今日のおすすめ</span><div id="recommendTitle" class="detail-title">確認中…</div><div id="recommendText" class="detail-body">最近の記録から考えます。</div><a href="./training.html">トレーニングへ →</a></section>
+ <section class="research-detail"><span class="detail-kicker">🌳 次の研究解放</span><div id="researchTitle" class="detail-title">確認中…</div><div id="researchText" class="detail-body">研究の進行状況を調べています。</div><a href="./tree.html">研究ツリーへ →</a></section>
+</div>
 <div class="muted" style="font-size:14px">SPは回数に比例しません。継続・振り返り・運動のバランスを大切に。</div>
 </section></div>
 <nav class="links"><a href="./storage-test.html">保存テスト</a><a href="./tree-test.html">旧研究ツリー試験</a><a href="./backup-test.html">JSONエクスポート・復元</a></nav></main>
@@ -25,6 +48,8 @@ h1{margin:0;font-size:clamp(24px,3vw,32px)}.muted{color:#657181;line-height:1.6}
 import {readTrainingSummary,findExercise,localDay} from "./js/training.js";
 import {watchResearchDay} from "./js/day-watch.js";
 import {initAssistants} from "./js/assistants.js";
+import {NODES,readTreeState} from "./js/tree.js";
+import {OWNER_ID,findExercise as findTrainingExercise} from "./js/training.js";
 const $=id=>document.getElementById(id);
 const assistant=initAssistants({host:".hero",portrait:".hero-illustration",bubble:"#greeting",fallbackName:".hero-art .name"});
 let shownDay=localDay();
@@ -39,7 +64,32 @@ async function renderHome(newDay=false){
  if(summary.records.length){
  const last=summary.records[0],ex=findExercise(last.exerciseId);
  $("latest").textContent=(ex?.name||last.exerciseId)+"："+(last.reps??last.duration)+(ex?.unit||"")+" × "+last.sets+"セット";
- }else $("latest").textContent="まだ研究記録がありません。最初の一歩から！";
+ const effortLabels={1:"らく",2:"ふつう",3:"きつい"};
+ const details=[last.effort?("きつさ："+(effortLabels[last.effort]||"記録済み")):"",last.note?("メモ："+last.note):""].filter(Boolean);
+ $("latestDetail").textContent=details.join(" / ");
+ }else{$("latest").textContent="まだ研究記録がありません。最初の一歩から！";$("latestDetail").textContent=""}
+ const recent=summary.records.slice(0,5);
+ const groups=new Set(summary.todayRecords.map(r=>findTrainingExercise(r.exerciseId)?.group).filter(Boolean));
+ let suggestion={title:"自分のペースで始めよう",reason:"今日の調子を見ながら、気軽に種目を選ぼう。"};
+ if(groups.size){
+  if(!groups.has("recovery"))suggestion={title:"ストレッチ",reason:"今日の運動に加えて、身体をいたわる時間もつくろう。"};
+  else suggestion={title:"今日は休息も選択肢",reason:"すでに活動した日。無理に回数を増やさなくても大丈夫。"};
+ }else if(recent.length){
+  const lastGroup=findTrainingExercise(recent[0].exerciseId)?.group;
+  suggestion=lastGroup==="upper"?{title:"脚の日、または休息",reason:"前回は上半身中心。疲れがなければスクワットも候補。"}:
+   lastGroup==="lower"?{title:"エアロバイクか休息",reason:"前回は脚中心。体調に合わせて軽めの選択も。"}:
+   {title:"今日も無理なく",reason:"前回の記録を参考に、好きな種目を選んでみよう。"};
+ }
+ $("recommendTitle").textContent=suggestion.title;
+ $("recommendText").textContent=suggestion.reason;
+ try{
+  const state=await readTreeState(OWNER_ID);
+  const available=NODES.filter(n=>!state.unlocked.has(n.id)&&n.requires.every(req=>state.unlocked.has(req)));
+  const next=available[0],total=NODES.length;
+  $("researchTitle").textContent=next?next.title:"研究はすべて解放済み！";
+  $("researchText").textContent=next?("解放済み "+state.unlocked.size+"/"+total+"件 · "+next.cost+" SP必要（残高 "+state.balance+" SP）"):"新しい研究の追加に期待しよう。";
+ }catch(error){$("researchTitle").textContent="研究状態を確認できません";$("researchText").textContent="研究ツリー画面から再確認してください。"}
+
  assistant.say(newDay?"day":summary.todayRecords.length?"active":"home");
  }catch(error){$("latest").textContent="記録を読み込めませんでした："+error.message}
 }
