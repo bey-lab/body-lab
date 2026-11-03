@@ -32,6 +32,22 @@ h1{font-size:clamp(23px,3vw,31px);margin:0 0 8px}h2{font-size:clamp(20px,2vw,25p
 }
 @media(max-width:450px){.character-stage{height:110px;min-height:110px;flex-basis:75px}}
 
+
+.compact-guide{border:1px solid #e0e5ed;background:#f7f9fc;border-radius:15px;padding:12px 16px;margin:10px 0 18px}
+.compact-guide summary{font-size:18px;font-weight:850;cursor:pointer;line-height:1.5;padding:6px 0}
+.compact-guide[open]{background:#fff}
+.compact-guide .guide-list{font-size:17px;margin:8px 0}
+.compact-guide .guide-list li{margin:7px 0}
+.compact-guide .warning{font-size:14px;margin:10px 0}
+.timer-area{padding:18px 20px;border-radius:18px;background:linear-gradient(135deg,#edf5ff,#f8f7ff);margin:12px 0}
+.timer-heading{font-weight:850;font-size:18px}
+.timer-digits{font-size:clamp(45px,7vw,72px);font-weight:950;letter-spacing:.05em;font-variant-numeric:tabular-nums;text-align:center;margin:12px 0;color:#253d60}
+.timer-state{font-size:15px;text-align:center;line-height:1.6;color:#50647c;min-height:26px}
+.timer-controls{margin-top:12px!important;padding-top:0!important}
+.timer-controls button{min-width:160px}
+.timer-note{font-size:13px;margin-bottom:0}
+@media(min-width:801px){.panel>div:not(.steps):not(.hidden){display:block;flex:1;min-height:0}.panel #select:not(.hidden){display:flex;flex-direction:column}.panel #select .full{margin-top:auto}.panel #workout{overflow-y:auto}.panel #workout .buttons{margin-top:14px;padding-top:0}}
+
 </style></head>
 <body>
 <header><a href="./" class="logo">☀️ BODY-LAB</a><span class="pill"><span id="researchDay"></span>　研究SP <span id="sp">--</span></span></header>
@@ -39,17 +55,31 @@ h1{font-size:clamp(23px,3vw,31px);margin:0 0 8px}h2{font-size:clamp(20px,2vw,25p
 <aside class="character"><div class="character-stage"><img class="character-image" src="./assets/characters/hinata.webp" alt="明日葉ヒナタの立ち絵" hidden onload="this.hidden=false" onerror="this.hidden=true"><div><div class="character-standin">☀️</div><div class="character-name">明日葉ヒナタ</div><small class="muted">立ち絵準備中</small></div></div>
 <div id="dialogue" class="dialogue">「所長っ！今日はどこを鍛えましょうか？」</div></aside>
 <section class="panel">
-<div class="steps"><div class="step active" id="nav-select">① 種目を選ぶ</div><div class="step" id="nav-guide">② ガイド</div><div class="step" id="nav-record">③ 結果入力</div></div>
-<div id="select"><h1>今日のトレーニング</h1><p class="muted">種目を選ぼう。無理せず、今日できることを！</p><div id="cards" class="cards"></div><button id="toGuide" class="primary full">フォームを確認する →</button></div>
-<div id="guide" class="hidden"><h1 id="guideTitle"></h1><p id="guideTip" class="muted"></p><div class="guide-visual"><b>フォーム図解は準備中</b><small>ここに種目別の大きな図解を配置予定</small></div><h2>やり方</h2><ol class="guide-list" id="guideSteps"></ol><div class="warning" id="guideCaution"></div><div class="buttons"><button class="secondary" id="backSelect">← 種目変更</button><button class="primary" id="toRecord">運動が終わった！ →</button></div></div>
-<div id="record" class="hidden"><h1 id="recordTitle"></h1><p id="previous" class="muted"></p><div class="inputs">
+<div class="steps"><div class="step active" id="nav-select">① 種目を選ぶ</div><div class="step" id="nav-guide">② トレーニング・記録</div></div>
+<div id="select"><h1>今日のトレーニング</h1><p class="muted">種目を選ぼう。ガイドと結果入力をひとつの画面にまとめたぞ！</p><div id="cards" class="cards"></div><button id="toGuide" class="primary full">この種目を始める →</button></div>
+<div id="workout" class="hidden">
+<h1 id="guideTitle"></h1><p id="guideTip" class="muted"></p>
+<details id="guideDetails" class="compact-guide"><summary>📖 やり方・安全ガイドを確認</summary><ol class="guide-list" id="guideSteps"></ol><div class="warning" id="guideCaution"></div></details>
+<div id="timerArea" class="hidden timer-area">
+ <div class="timer-heading">⏱️ タイマーで記録</div>
+ <div class="timer-digits" id="timerClock" role="timer" aria-label="経過時間">00:00</div>
+ <div id="timerState" class="timer-state">スタートすると、この端末に開始時刻が保存されます。</div>
+ <div class="buttons timer-controls"><button class="primary" id="timerStart">▶ スタート</button><button class="secondary hidden" id="timerStop">■ ストップして記録</button><button class="secondary hidden" id="timerCancel">計測を破棄</button></div>
+ <p class="muted timer-note">別アプリで映画を観てもOK。戻ったらストップ。実際に運動した時間だけを記録してください。自動停止はしません。</p>
+</div>
+<div id="manualArea">
+<h2 id="recordTitle">結果を入力</h2><p id="previous" class="muted"></p>
+<div class="inputs">
 <label class="field" id="amountField">回数<input id="amount" type="number" inputmode="numeric" min="1" step="1" value="10"></label>
 <label class="field">セット数<input id="sets" type="number" inputmode="numeric" min="1" max="30" step="1" value="1"></label>
 <label class="field hidden" id="weightField">ダンベルの重さ（1本あたりkg）<input id="kg" type="number" inputmode="decimal" min="0.5" max="100" step="0.5" value="5"></label>
 </div>
 <h2>きつさはどうだった？</h2><div class="efforts"><button class="effort" data-effort="1">😊 らく</button><button class="effort selected" data-effort="2">🙂 ふつう</button><button class="effort" data-effort="3">💦 きつい</button></div>
 <div class="section"><label class="field">メモ（任意）<textarea id="note" maxlength="300" placeholder="今日はフォームが安定した！"></textarea></label></div>
-<div class="buttons"><button class="secondary" id="backGuide">← ガイドへ</button><button class="primary" id="save">研究記録を保存！</button></div><p id="status" class="status" aria-live="polite"></p></div>
+<div class="buttons"><button class="secondary" id="backSelect">← 種目変更</button><button class="primary" id="save">研究記録を保存！</button></div>
+</div>
+<p id="status" class="status" role="status" aria-live="polite"></p>
+</div>
 <div id="done" class="hidden"><h1>🎉 研究記録を保存したぞ！</h1><div class="success"><p id="resultDetail"></p><p>獲得した研究SP</p><strong id="earned"></strong><p id="rewardNote" class="muted"></p></div><div class="buttons"><button class="secondary" id="again">もう1種目</button><button class="primary" id="home">ホームへ戻る →</button></div></div>
 </section></main>
 <script type="module">
@@ -58,27 +88,127 @@ import {watchResearchDay} from "./js/day-watch.js";
 import {initAssistants} from "./js/assistants.js";
 const $=id=>document.getElementById(id);
 const assistant=initAssistants({host:".character",portrait:".character-image",bubble:"#dialogue",fallbackName:".character-name"});
-let chosen=EXERCISES[0],effort=2,busy=false,summary=null,shownDay=localDay();
+const TIMER_KEY="body-lab-active-timer-v1";
+const TIMED=new Set(["bike","plank"]);
+let chosen=EXERCISES[0],effort=2,busy=false,summary=null,shownDay=localDay(),timer=null,interval=null;
+const say=(key,values)=>assistant.say(key,values);
 function dateLabel(day){const parts=day.split("-");return Number(parts[1])+"月"+Number(parts[2])+"日";}
-function say(key,values){assistant.say(key,values)}
-function phase(p){for(const name of ["select","guide","record","done"])$(name).classList.toggle("hidden",name!==p);for(const name of ["select","guide","record"])$("nav-"+name).classList.toggle("active",p===name);window.scrollTo({top:0,behavior:"instant"})}
-function renderCards(){const root=$("cards");root.replaceChildren();for(const ex of EXERCISES){const btn=document.createElement("button");btn.className="exercise"+(ex.id===chosen.id?" selected":"");btn.textContent=ex.name;const small=document.createElement("span");small.textContent=ex.category+" / "+ex.tip;btn.append(small);btn.onclick=()=>{chosen=ex;renderCards();say("exercise",{exercise:ex.name})};root.append(btn)}}
-function guide(){phase("guide");$("guideTitle").textContent=chosen.name;$("guideTip").textContent=chosen.tip;const steps=$("guideSteps");steps.replaceChildren();for(const line of chosen.steps){const li=document.createElement("li");li.textContent=line;steps.append(li)}$("guideCaution").textContent="⚠️ "+chosen.caution;say("guide")}
-function record(){phase("record");$("recordTitle").textContent=chosen.name+"の結果";const prev=summary?.records.find(r=>r.exerciseId===chosen.id);$("amountField").firstChild.textContent=chosen.kind==="reps"?"回数":chosen.kind==="seconds"?"保持時間（秒）":"運動時間（分）";$("weightField").classList.toggle("hidden",!chosen.weight);
-$("amount").value=prev?(prev.reps??prev.duration):(chosen.kind==="minutes"?10:chosen.kind==="seconds"?30:10);$("sets").value=prev?.sets||1;$("kg").value=prev?.weightKg||5;
-$("previous").textContent=prev?"前回："+(prev.reps??prev.duration)+chosen.unit+" × "+prev.sets+"セット":"初めての記録だ！";$("status").textContent="";say("record")}
+function phase(p){
+ for(const name of ["select","workout","done"])$(name).classList.toggle("hidden",name!==p);
+ $("nav-select").classList.toggle("active",p==="select");
+ $("nav-guide").classList.toggle("active",p==="workout"||p==="done");
+ if(p==="workout")scrollTo({top:0,behavior:"instant"});
+}
+function renderCards(){
+ const root=$("cards");root.replaceChildren();
+ for(const ex of EXERCISES){
+  const btn=document.createElement("button");btn.className="exercise"+(ex.id===chosen.id?" selected":"");btn.textContent=ex.name;
+  const small=document.createElement("span");small.textContent=ex.category+" / "+ex.tip;btn.append(small);
+  btn.onclick=()=>{if(timer&&timer.running){$("status").textContent="計測中は種目変更できません。先にストップするか破棄してください。";return}chosen=ex;renderCards();say("exercise",{exercise:ex.name})};
+  root.append(btn);
+ }
+}
+function loadTimer(){
+ try{const value=JSON.parse(localStorage.getItem(TIMER_KEY)||"null");
+  if(value&&TIMED.has(value.exerciseId)&&typeof value.startedAt==="number"&&Number.isFinite(value.startedAt)&&typeof value.id==="string"){
+   return {id:value.id,exerciseId:value.exerciseId,startedAt:value.startedAt,stoppedAt:value.stoppedAt||null,running:!value.stoppedAt};
+  }
+ }catch{}return null;
+}
+function persistTimer(){try{if(timer)localStorage.setItem(TIMER_KEY,JSON.stringify(timer));else localStorage.removeItem(TIMER_KEY)}catch(error){throw Error("端末にタイマーを保存できません: "+error.message)}}
+function formatElapsed(ms){const sec=Math.floor(Math.max(0,ms)/1000);return String(Math.floor(sec/3600)).padStart(2,"0")+":"+String(Math.floor(sec%3600/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")}
+function elapsed(){return timer?Math.max(0,(timer.stoppedAt||Date.now())-timer.startedAt):0}
+function tick(){
+ $("timerClock").textContent=formatElapsed(elapsed());
+ if(!timer){$("timerState").textContent="スタートすると、この端末に開始時刻が保存されます。";}
+ else if(timer.running){$("timerState").textContent="計測中。別アプリに移動しても開始時刻を保持します。";}
+ else $("timerState").textContent="停止済み。保存が完了していない場合はもう一度ストップしてください。";
+ $("timerStart").classList.toggle("hidden",!!timer);
+ $("timerStop").classList.toggle("hidden",!timer);
+ $("timerStop").textContent=timer?.running?"■ ストップして記録":"記録の保存を再試行";
+ $("timerCancel").classList.toggle("hidden",!timer);
+}
+function renderWorkout(){
+ $("guideTitle").textContent=chosen.name;
+ $("guideTip").textContent=chosen.tip;
+ const steps=$("guideSteps");steps.replaceChildren();for(const line of chosen.steps){const li=document.createElement("li");li.textContent=line;steps.append(li)}
+ $("guideCaution").textContent="⚠️ "+chosen.caution;
+ const isTimed=TIMED.has(chosen.id);
+ $("timerArea").classList.toggle("hidden",!isTimed);
+ $("manualArea").classList.toggle("hidden",isTimed);
+ $("guideDetails").open=!isTimed && !summary?.records.some(r=>r.exerciseId===chosen.id);
+ if(!isTimed){
+  const prev=summary?.records.find(r=>r.exerciseId===chosen.id);
+  $("recordTitle").textContent=chosen.name+"の結果";
+  $("amountField").firstChild.textContent=chosen.kind==="reps"?"回数":chosen.kind==="seconds"?"保持時間（秒）":"運動時間（分）";
+  $("weightField").classList.toggle("hidden",!chosen.weight);
+  $("amount").value=prev?(prev.reps??prev.duration):10;
+  $("sets").value=prev?.sets||1;$("kg").value=prev?.weightKg||5;
+  $("previous").textContent=prev?"前回："+(prev.reps??prev.duration)+chosen.unit+" × "+prev.sets+"セット":"初めての記録だ！";
+ }
+ $("status").textContent="";tick();phase("workout");say("guide");
+}
 async function refresh(){summary=await readTrainingSummary();shownDay=summary.today;$("sp").textContent=summary.sp;$("researchDay").textContent=dateLabel(shownDay)}
-$("toGuide").onclick=guide;$("backSelect").onclick=()=>{phase("select");say("back")};$("toRecord").onclick=record;$("backGuide").onclick=guide;$("again").onclick=async()=>{await refresh();phase("select");say("again")};$("home").onclick=()=>location.assign("./");
+function saved(result){
+ $("resultDetail").textContent=chosen.name+"："+result.amount+chosen.unit+" × "+result.sets+"セット";
+ $("earned").textContent="+"+result.earned+" SP";
+ $("rewardNote").textContent=result.alreadySaved?"同じ計測記録は保存済み。SPの重複付与はありません。":result.earned===0?"今日のSPは獲得済み。記録したこと自体が研究成果だ！":"今日の研究にSPが加算された！";
+ phase("done");say("done");
+}
+async function save({automatic=false}={}){
+ if(busy)return;
+ busy=true;$("save").disabled=true;$("timerStop").disabled=true;$("status").textContent="";
+ try{
+  let amount=$("amount").value,sets=$("sets").value,recordId;
+  if(automatic){
+   if(!timer||timer.exerciseId!==chosen.id)throw Error("タイマー情報がありません");
+   const duration=elapsed(),min=chosen.kind==="minutes"?60000:1000,max=chosen.kind==="minutes"?86400000:36000000;
+   if(duration<min)throw Error(chosen.kind==="minutes"?"1分未満の計測は保存しません。記録を破棄するか、再度運動してください。":"1秒未満の計測は保存しません。");
+   if(duration>max)throw Error("計測が長すぎます。実際に運動した時間を確認して、計測を破棄してください。");
+   amount=chosen.kind==="minutes"?Math.max(1,Math.floor(duration/60000)):Math.floor(duration/1000);
+   sets=1;recordId=timer.id;
+  }
+  const result=await saveTraining({exerciseId:chosen.id,amount,sets,kg:$("kg").value,effort,note:$("note").value,...(recordId?{recordId}:{})});
+  if(automatic){timer=null;persistTimer();tick()}
+  await refresh();saved(result);
+ }catch(error){$("status").textContent="保存できませんでした："+error.message}
+ finally{busy=false;$("save").disabled=false;$("timerStop").disabled=false}
+}
+$("toGuide").onclick=renderWorkout;
+$("backSelect").onclick=()=>{if(timer){$("status").textContent="タイマーの計測を終了または破棄してから戻ってください。";return}phase("select");say("back")};
+$("again").onclick=async()=>{await refresh();phase("select");say("again")};
+$("home").onclick=()=>location.assign("./");
+$("save").onclick=()=>save();
 for(const btn of document.querySelectorAll("[data-effort]"))btn.onclick=()=>{effort=Number(btn.dataset.effort);for(const b of document.querySelectorAll("[data-effort]"))b.classList.toggle("selected",b===btn)};
-$("save").onclick=async()=>{if(busy)return;busy=true;$("save").disabled=true;$("status").textContent="";
-try{const result=await saveTraining({exerciseId:chosen.id,amount:$("amount").value,sets:$("sets").value,kg:$("kg").value,effort,note:$("note").value});await refresh();$("resultDetail").textContent=chosen.name+"："+result.amount+chosen.unit+" × "+result.sets+"セット";$("earned").textContent="+"+result.earned+" SP";$("rewardNote").textContent=result.earned===0?"今日のSPは獲得済み。記録したこと自体が研究成果だ！":"今日の研究にSPが加算された！";say("done");phase("done")}
-catch(e){$("status").textContent="保存できませんでした："+e.message}
-finally{busy=false;$("save").disabled=false}};
-try{await refresh();renderCards()}catch(e){$("status").textContent="初期化に失敗しました："+e.message;renderCards()}
-async function onDayChange(){await refresh();if(!$("done").classList.contains("hidden"))return;say("day");if(!$("record").classList.contains("hidden"))$("previous").textContent="日付が切り替わりました。記録は保存時点の日付になります。";}
-watchResearchDay(onDayChange);
-document.addEventListener("visibilitychange",()=>{if(!document.hidden)onDayChangeIfNeeded()});
-window.addEventListener("pageshow",onDayChangeIfNeeded);
-function onDayChangeIfNeeded(){if(localDay()!==shownDay)onDayChange();else refresh()}
+$("timerStart").onclick=()=>{
+ if(timer)return;
+ try{timer={id:"timer:"+crypto.randomUUID(),exerciseId:chosen.id,startedAt:Date.now(),stoppedAt:null,running:true};persistTimer();tick();$("status").textContent="計測開始！実際に運動した時間を計ってください。"}
+ catch(error){timer=null;$("status").textContent=error.message}
+};
+$("timerStop").onclick=async()=>{
+ if(!timer||busy)return;
+ if(timer.running){timer.stoppedAt=Date.now();timer.running=false;try{persistTimer()}catch(error){$("status").textContent=error.message;return}}
+ tick();await save({automatic:true});
+};
+$("timerCancel").onclick=()=>{
+ if(!timer||busy)return;
+ if(!confirm("この計測を破棄します。運動記録もSPも保存されません。よろしいですか？"))return;
+ try{timer=null;persistTimer();tick();$("status").textContent="計測を破棄しました。"}catch(error){$("status").textContent=error.message}
+};
+async function onReturn(){
+ const savedTimer=loadTimer();
+ if(savedTimer&&(!timer||savedTimer.id!==timer.id))timer=savedTimer;
+ if(timer&&timer.exerciseId!==chosen.id){chosen=EXERCISES.find(e=>e.id===timer.exerciseId)||chosen;renderCards();renderWorkout()}
+ tick();
+ if(localDay()!==shownDay){await refresh();say("day")}else await refresh();
+}
+try{
+ await refresh();renderCards();timer=loadTimer();tick();
+ if(timer){chosen=EXERCISES.find(e=>e.id===timer.exerciseId)||chosen;renderCards();renderWorkout();$("status").textContent="保存済みの計測を復元しました。";}
+}catch(e){$("status").textContent="初期化に失敗しました："+e.message;renderCards()}
+interval=setInterval(tick,1000);
+watchResearchDay(async()=>{await refresh();say("day")});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)onReturn()});
+window.addEventListener("pageshow",onReturn);
 </script><script type="module" src="./js/navigation.js"></script>
 </body></html>
