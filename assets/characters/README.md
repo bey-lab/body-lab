@@ -1,0 +1,1 @@
+BODY-LAB character assets
