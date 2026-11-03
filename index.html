@@ -28,11 +28,23 @@ h1{margin:0;font-size:clamp(24px,3vw,32px)}.muted{color:#657181;line-height:1.6}
 .research-detail a{color:#355d9b;font-weight:800;text-decoration:underline;text-underline-offset:2px;font-size:14px;margin-top:auto}
 @media(max-width:510px){.research-detail-grid{grid-template-columns:1fr}}
 
+
+.coolness{border-radius:20px;padding:17px 20px;background:linear-gradient(110deg,#293146,#465675);color:#fff;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;box-shadow:0 7px 18px #263d6027}
+.coolness .cool-label{font-weight:900;font-size:16px;color:#ffdf81}
+.coolness .cool-number{font-size:clamp(38px,5vw,56px);font-weight:1000;line-height:1.12;font-variant-numeric:tabular-nums}
+.coolness .cool-rank{font-size:13px;color:#edf2ff;line-height:1.4}
+.coolness .cool-details{font-size:12px;color:#d1ddf6;line-height:1.5;margin-top:4px}
+.coolness .cool-emblem{font-size:clamp(30px,5vw,55px);text-align:center}
+@media(max-width:510px){.coolness{padding:15px}}
 </style></head><body>
 <header><div><div class="brand">☀️ BODY-LAB</div><p class="tagline">不純な動機で、健全な肉体を。</p></div><div class="sp">研究SP <span id="sp">--</span></div></header>
 <main><div class="main">
 <section class="hero"><div class="hero-art"><img class="hero-illustration" src="./assets/characters/hinata.webp" alt="明日葉ヒナタの立ち絵" hidden onload="this.hidden=false" onerror="this.hidden=true"><div class="sun">☀️</div><div class="name">明日葉ヒナタ</div><span class="placeholder">立ち絵スペース・準備中</span></div><div class="speech" id="greeting">「所長っ！今日も一緒に頑張りましょう！」</div></section>
 <section class="actions"><h1>研究所へようこそ！</h1><div class="muted">ちょっと動く日も、身体をいたわる日も。少しずつ研究を積み重ねよう。</div>
+<section class="coolness" aria-label="かっこいい度">
+ <div><div class="cool-label">✦ かっこいい度</div><div class="cool-number"><span id="coolness">--</span><span style="font-size:17px;margin-left:5px">pt</span></div>
+ <div class="cool-rank" id="coolRank">研究データを読み込み中…</div><div class="cool-details" id="coolDetails">毎日の継続で育つ、研究所のお楽しみ指標</div></div><div class="cool-emblem" aria-hidden="true">⚡</div>
+</section>
 <div class="stats"><div class="stat"><small id="todayLabel">今日の記録</small><strong id="today">--</strong></div><div class="stat"><small>活動日数</small><strong id="days">--</strong></div></div>
 <a class="button" href="./training.html">💪 今日のトレーニング</a>
 <div class="small-actions"><a class="button sub" href="./tree.html">🌳 研究ツリー</a><a class="button sub" href="./backup-test.html">🔐 バックアップ</a></div>
@@ -50,6 +62,7 @@ import {watchResearchDay} from "./js/day-watch.js";
 import {initAssistants} from "./js/assistants.js";
 import {NODES,readTreeState} from "./js/tree.js";
 import {OWNER_ID,findExercise as findTrainingExercise} from "./js/training.js";
+import {calculateCoolness} from "./js/coolness.js";
 const $=id=>document.getElementById(id);
 const assistant=initAssistants({host:".hero",portrait:".hero-illustration",bubble:"#greeting",fallbackName:".hero-art .name"});
 let shownDay=localDay();
@@ -61,6 +74,10 @@ async function renderHome(newDay=false){
  $("today").textContent=summary.todayRecords.length+" 件";
  $("todayLabel").textContent="今日の記録";
  $("days").textContent=summary.activeDays+" 日";
+ const cool=calculateCoolness(summary.records);
+ $("coolness").textContent=cool.score.toLocaleString("ja-JP");
+ $("coolRank").textContent="称号： "+cool.rank;
+ $("coolDetails").textContent="活動日 "+cool.activeDays+"日 · 種類 "+cool.groupCount+"系統 · バランス "+cool.balanceDays+"日";
  if(summary.records.length){
  const last=summary.records[0],ex=findExercise(last.exerciseId);
  $("latest").textContent=(ex?.name||last.exerciseId)+"："+(last.reps??last.duration)+(ex?.unit||"")+" × "+last.sets+"セット";
