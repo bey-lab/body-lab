@@ -27,14 +27,18 @@ export async function saveTraining(input,profileId=OWNER_ID){
  if(!Number.isSafeInteger(effort)||effort<1||effort>3)throw new Error("きつさを選んでください");
  const kg=ex.weight?Number(input.kg):null;
  if(ex.weight&&(!Number.isFinite(kg)||kg<=0||kg>100))throw new Error("ダンベル重量を確認してください");
- const now=new Date(),performedAt=now.toISOString(),day=localDay(now),id="training:"+crypto.randomUUID(),note=String(input.note||"").slice(0,300);
+ const now=new Date(),performedAt=now.toISOString(),day=localDay(now),id=input.recordId&&/^timer:[a-z0-9-]{8,100}$/.test(input.recordId)?input.recordId:"training:"+crypto.randomUUID(),note=String(input.note||"").slice(0,300);
  const db=await openBodyLabDB();
  return new Promise((resolve,reject)=>{
   const tx=db.transaction([STORES.records,STORES.spLedger],"readwrite");
   const recordStore=tx.objectStore(STORES.records),spStore=tx.objectStore(STORES.spLedger);
   let earned=0;
-  const prior=recordStore.getAll();
-  prior.onsuccess=()=>{
+  let alreadySaved=false;
+  const existingRecord=recordStore.get(id);
+  existingRecord.onsuccess=()=>{
+   if(existingRecord.result){alreadySaved=true;return;}
+   const prior=recordStore.getAll();
+   prior.onsuccess=()=>{
    const todayRecords=prior.result.filter(r=>r.profileId===profileId&&r.sourceMode==="manual-v1"&&r.localDay===day);
    const keys=[];
    if(todayRecords.length===0)keys.push(["daily-first",5]);
@@ -54,7 +58,8 @@ export async function saveTraining(input,profileId=OWNER_ID){
     }
    };
   };
-  tx.oncomplete=()=>resolve({id,earned,exercise:ex,amount,sets,day});
+  };
+  tx.oncomplete=()=>resolve({id,earned,alreadySaved,exercise:ex,amount,sets,day});
   tx.onerror=()=>reject(tx.error||new Error("保存できませんでした"));
   tx.onabort=()=>reject(tx.error||new Error("保存が中断されました"));
  });
