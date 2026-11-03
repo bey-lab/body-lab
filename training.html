@@ -8,7 +8,7 @@ button:disabled{cursor:default;opacity:.5}a{color:inherit}header{display:flex;al
 .character{border-radius:24px;background:linear-gradient(160deg,#ffe17b,#fff2c5 60%,#fdf5e5);padding:16px;min-height:570px;display:flex;flex-direction:column;justify-content:space-between}
 .character-stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;min-height:290px;text-align:center;overflow:hidden}.character-image{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 14px #a27d4e44)}.character-stage:has(.character-image:not([hidden])) .character-standin,.character-stage:has(.character-image:not([hidden])) .character-name,.character-stage:has(.character-image:not([hidden])) small{display:none}
 .character-standin{font-size:clamp(5rem,13vw,9rem);line-height:1.2}.character-name{font-weight:900;font-size:1.2rem}.dialogue{background:#fff;border:2px solid #f0cb6b;border-radius:18px;padding:20px;font-weight:800;font-size:clamp(18px,2vw,23px);line-height:1.7}
-.panel{background:#fff;border-radius:24px;padding:clamp(18px,3vw,32px);box-shadow:0 8px 26px #493b280d;min-width:0}.steps{display:flex;gap:8px;margin-bottom:25px}.step{flex:1;text-align:center;background:#e9edf4;padding:12px 3px;border-radius:12px;font-size:clamp(13px,1.4vw,17px);font-weight:800}.step.active{background:#ffcf55}
+.panel{background:#fff;border-radius:24px;padding:clamp(18px,3vw,32px);box-shadow:0 8px 26px #493b280d;min-width:0}.steps{display:flex;gap:8px;margin-bottom:25px}.step{flex:1;text-align:center;background:#e9edf4;padding:12px 3px;border-radius:12px;font-size:clamp(13px,1.4vw,17px);font-weight:800}.step.active{background:#ffcf55}.steps button.step{border:0;border-radius:12px;min-height:50px;cursor:pointer;color:#293247}.steps button.step:focus-visible{outline:3px solid #4866a8;outline-offset:2px}
 h1{font-size:clamp(23px,3vw,31px);margin:0 0 8px}h2{font-size:clamp(20px,2vw,25px);margin:18px 0 10px}p{line-height:1.7}.muted{color:#677184}.section{margin-top:15px}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.exercise{background:#f4f6fa;border:2px solid transparent;text-align:left;padding:18px;min-height:95px;font-size:17px}.exercise span{display:block;color:#667182;font-size:14px;margin-top:5px;font-weight:500}.exercise.selected{background:#fff4d5;border-color:#edb132}.primary{background:#ffc849;color:#34240a}.secondary{background:#e9edf4;color:#293247}.full{width:100%;margin-top:15px}.guide-visual{height:165px;border-radius:16px;background:repeating-linear-gradient(130deg,#f5f7fb,#f5f7fb 16px,#edf1f8 16px,#edf1f8 18px);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;color:#5f6d7f;margin:15px 0}.guide-visual b{font-size:1.1rem}.guide-list{font-size:clamp(18px,1.7vw,21px);line-height:1.65;padding-left:30px}.guide-list li{margin:12px 0}.warning{border-left:5px solid #e8aa36;background:#fff7df;padding:14px;border-radius:8px;font-size:16px;line-height:1.7}.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.buttons button{flex:1}.inputs{display:grid;grid-template-columns:1fr 1fr;gap:15px}.field{display:flex;flex-direction:column;gap:7px;font-weight:800}.field input,.field textarea{width:100%;font-size:22px;padding:12px;border:2px solid #dce2e9;border-radius:12px;min-width:0}.field textarea{font-size:16px;min-height:85px}.field small{font-weight:500;color:#687488}.efforts{display:flex;gap:9px;flex-wrap:wrap}.effort{background:#e9edf4}.effort.selected{background:#ffce55}.success{background:#f3fff7;border:2px solid #91d2ad;border-radius:18px;padding:22px;font-size:18px}.success strong{font-size:30px;color:#11884d}.status{color:#a52e2e;font-weight:700;min-height:25px}.hidden{display:none!important}
 @media(max-width:800px){.layout{grid-template-columns:1fr;padding:12px;gap:12px}.character{min-height:0;flex-direction:row;align-items:center;gap:14px}.character-stage{min-height:0;flex:0 0 95px}.character-standin{font-size:4rem}.dialogue{flex:1;padding:12px;font-size:17px}.character-name{display:none}.panel{padding:18px}.guide-visual{height:120px}}@media(max-width:800px){.character{flex-wrap:wrap}.character .bodylab-assistant-switch{order:3;flex-basis:100%}}@media(max-width:450px){.cards{grid-template-columns:1fr}.inputs{grid-template-columns:1fr}.layout{padding:8px}.steps{margin-bottom:15px}.character-stage{flex-basis:65px}.character-standin{font-size:3rem}}
 
@@ -70,7 +70,7 @@ h1{font-size:clamp(23px,3vw,31px);margin:0 0 8px}h2{font-size:clamp(20px,2vw,25p
 <aside class="character"><div class="character-stage"><img class="character-image" src="./assets/characters/hinata.webp" alt="明日葉ヒナタの立ち絵" hidden onload="this.hidden=false" onerror="this.hidden=true"><div><div class="character-standin">☀️</div><div class="character-name">明日葉ヒナタ</div><small class="muted">立ち絵準備中</small></div></div>
 <div id="dialogue" class="dialogue">「所長っ！今日はどこを鍛えましょうか？」</div></aside>
 <section class="panel">
-<div class="steps"><div class="step active" id="nav-select">① 種目を選ぶ</div><div class="step" id="nav-guide">② トレーニング・記録</div></div>
+<div class="steps"><button type="button" class="step active" id="nav-select" aria-label="種目選択へ戻る">① 種目を選ぶ</button><button type="button" class="step" id="nav-guide" aria-label="トレーニング・記録画面へ移動">② トレーニング・記録</button></div>
 <div id="select"><h1>今日のトレーニング</h1><p class="muted">種目を選ぼう。ガイドと結果入力をひとつの画面にまとめたぞ！</p><div id="cards" class="cards"></div><button id="toGuide" class="primary full">この種目を始める →</button></div>
 <div id="workout" class="hidden">
 <h1 id="guideTitle"></h1><p id="guideTip" class="muted"></p>
@@ -80,7 +80,7 @@ h1{font-size:clamp(23px,3vw,31px);margin:0 0 8px}h2{font-size:clamp(20px,2vw,25p
  <div class="timer-digits" id="timerClock" role="timer" aria-label="経過時間">00:00</div>
  <div id="timerState" class="timer-state">スタートすると、この端末に開始時刻が保存されます。</div>
  <div class="buttons timer-controls"><button class="primary" id="timerStart">▶ スタート</button><button class="secondary hidden" id="timerStop">■ ストップして記録</button><button class="secondary hidden" id="timerCancel">計測を破棄</button></div>
- <p class="muted timer-note">別アプリで映画を観てもOK。戻ったらストップ。実際に運動した時間だけを記録してください。自動停止はしません。</p>
+ <p class="muted timer-note">別アプリで映画を観てもOK。戻ったらストップ。実際に運動した時間だけを記録してください。自動停止はしません。</p><button class="secondary" id="timerBack" type="button" style="margin-top:12px;width:100%">← 種目選択へ戻る</button>
 </div>
 <div id="manualArea">
 <h2 id="recordTitle">結果を入力</h2><p id="previous" class="muted"></p>
@@ -191,7 +191,15 @@ async function save({automatic=false}={}){
  finally{busy=false;$("save").disabled=false;$("timerStop").disabled=false}
 }
 $("toGuide").onclick=renderWorkout;
-$("backSelect").onclick=()=>{if(timer){$("status").textContent="タイマーの計測を終了または破棄してから戻ってください。";return}phase("select");say("back")};
+function goSelect(){
+ if(busy)return;
+ if(timer){$("status").textContent="計測中・保存待ちのタイマーがあります。先にストップして記録するか、計測を破棄してください。";return}
+ phase("select");say("back");
+}
+$("nav-select").onclick=goSelect;
+$("nav-guide").onclick=()=>{if(busy)return;if(timer&&timer.exerciseId!==chosen.id){$("status").textContent="計測中の種目に戻ってください。";return}if($("workout").classList.contains("hidden"))renderWorkout()};
+$("backSelect").onclick=goSelect;
+$("timerBack").onclick=goSelect;
 $("again").onclick=async()=>{await refresh();phase("select");say("again")};
 $("home").onclick=()=>location.assign("./");
 $("save").onclick=()=>save();
