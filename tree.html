@@ -3,7 +3,7 @@
 <title>BODY-LAB 研究ツリー</title>
 <style>
 :root{font-family:system-ui,-apple-system,sans-serif;color:#262d3f;background:#fff8eb}
-*{box-sizing:border-box}body{max-width:850px;margin:auto;padding:25px 15px 60px}
+*{box-sizing:border-box}body{max-width:850px;margin:auto;padding:0 15px 60px}
 h1{font-size:1.6rem;margin:0 0 9px}h2{font-size:1.14rem;margin:0}
 p{line-height:1.65}.muted{color:#666b79;font-size:.88rem}
 header{background:linear-gradient(115deg,#ffdc67,#ffb83e);border-radius:24px;padding:24px;box-shadow:0 6px 20px #df991e22}
@@ -33,16 +33,16 @@ a{color:#3262a8}
 <section><strong>🔐 保存試験について</strong><p class="muted">手動トレーニングや日々の振り返りで獲得したSPを使います。旧保存テストの5SPとは別です。解放状況はIndexedDBとJSONバックアップに保存されます。</p>
 <p id="status" aria-live="polite">データを読み込み中…</p>
 <button id="reload">データを再読み込み</button></section>
-<section><h2>☀️ 明日葉ひなたの研究</h2><div id="hinata" class="cards"></div></section>
-<section><h2>❄️ クール系助手（仮）の研究</h2><div id="analyst" class="cards"></div></section>
-<section><h2>💜 ミレイの研究</h2><div id="mirei" class="cards"></div></section>
+<section><h2>☀️ 明日葉ヒナタの研究</h2><div id="hinata" class="cards"></div></section>
+<section><h2>❄️ 御影セナの研究</h2><div id="analyst" class="cards"></div></section>
+<section><h2>💜 九条ミレイの研究</h2><div id="mirei" class="cards"></div></section>
 <section><h2>今後の拡張</h2><p class="muted">衣装・秘密のプロフィール・特別な会話も同じ固定ID方式で追加できる。安全に関わる運動情報はアンロック不要にする。</p>
 <a href="./backup-test.html">バックアップ試験場へ</a>　<a href="./training.html">トレーニングへ</a>　<a href="./">ホームへ</a></section>
 <script type="module">
 import {NODES,readTreeState,purchaseNode} from "./js/tree.js";
 import {OWNER_ID} from "./js/training.js";
 const $=id=>document.getElementById(id);
-const labels={hinata:"☀️ ひなた",analyst:"❄️ 分析担当",mirei:"💜 ミレイ"};
+const labels={hinata:"☀️ 明日葉ヒナタ",analyst:"❄️ 御影セナ",mirei:"💜 九条ミレイ"};
 let working=false;
 function status(message,error=false){$("status").textContent=message;$("status").className=error?"error":"ok";}
 function text(tag,content,className){const element=document.createElement(tag);element.textContent=content;if(className)element.className=className;return element;}
@@ -69,7 +69,7 @@ function nodeCard(node,state){
 }
 async function render(){
  try {
- const state=await readTreeState();
+ const state=await readTreeState(OWNER_ID);
  $("sp").textContent=state.balance;
  for(const hero of ["hinata","analyst","mirei"]){
  const root=$(hero);root.replaceChildren();
@@ -80,4 +80,5 @@ async function render(){
 $("reload").onclick=()=>location.reload();
 try {await render();status("データを読み込みました。研究を選んで試せます。");}
 catch(e){status(e.message,true)}
-</script></body></html>
+</script><script type="module" src="./js/navigation.js"></script>
+</body></html>
