@@ -3,7 +3,7 @@
 <title>BODY-LAB 研究ツリー試験</title>
 <style>
 :root{font-family:system-ui,-apple-system,sans-serif;color:#262d3f;background:#fff8eb}
-*{box-sizing:border-box}body{max-width:850px;margin:auto;padding:25px 15px 60px}
+*{box-sizing:border-box}body{margin:0;padding:0 15px 60px}
 h1{font-size:1.6rem;margin:0 0 9px}h2{font-size:1.14rem;margin:0}
 p{line-height:1.65}.muted{color:#666b79;font-size:.88rem}
 header{background:linear-gradient(115deg,#ffdc67,#ffb83e);border-radius:24px;padding:24px;box-shadow:0 6px 20px #df991e22}
@@ -79,4 +79,5 @@ async function render(){
 $("reload").onclick=()=>location.reload();
 try {await render();status("データを読み込みました。研究を選んで試せます。");}
 catch(e){status(e.message,true)}
-</script></body></html>
+</script><script type="module" src="./js/navigation.js"></script>
+</body></html>
