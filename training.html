@@ -13,7 +13,7 @@ h1{font-size:clamp(23px,3vw,31px);margin:0 0 8px}h2{font-size:clamp(20px,2vw,25p
 @media(max-width:800px){.layout{grid-template-columns:1fr;padding:12px;gap:12px}.character{min-height:0;flex-direction:row;align-items:center;gap:14px}.character-stage{min-height:0;flex:0 0 95px}.character-standin{font-size:4rem}.dialogue{flex:1;padding:12px;font-size:17px}.character-name{display:none}.panel{padding:18px}.guide-visual{height:120px}}@media(max-width:450px){.cards{grid-template-columns:1fr}.inputs{grid-template-columns:1fr}.layout{padding:8px}.steps{margin-bottom:15px}.character-stage{flex-basis:65px}.character-standin{font-size:3rem}}
 </style></head>
 <body>
-<header><a href="./" class="logo">☀️ BODY-LAB</a><span class="pill">研究SP <span id="sp">--</span></span></header>
+<header><a href="./" class="logo">☀️ BODY-LAB</a><span class="pill"><span id="researchDay"></span>　研究SP <span id="sp">--</span></span></header>
 <main class="layout">
 <aside class="character"><div class="character-stage"><div><div class="character-standin">☀️</div><div class="character-name">明日葉ひなた</div><small class="muted">立ち絵準備中</small></div></div>
 <div id="dialogue" class="dialogue">「所長っ！今日はどこを鍛えましょうか？」</div></aside>
@@ -32,9 +32,11 @@ h1{font-size:clamp(23px,3vw,31px);margin:0 0 8px}h2{font-size:clamp(20px,2vw,25p
 <div id="done" class="hidden"><h1>🎉 研究記録を保存したぞ！</h1><div class="success"><p id="resultDetail"></p><p>獲得した研究SP</p><strong id="earned"></strong><p id="rewardNote" class="muted"></p></div><div class="buttons"><button class="secondary" id="again">もう1種目</button><button class="primary" id="home">ホームへ戻る →</button></div></div>
 </section></main>
 <script type="module">
-import {EXERCISES,readTrainingSummary,saveTraining} from "./js/training.js";
+import {EXERCISES,readTrainingSummary,saveTraining,localDay} from "./js/training.js";
+import {watchResearchDay} from "./js/day-watch.js";
 const $=id=>document.getElementById(id);
-let chosen=EXERCISES[0],effort=2,busy=false,summary=null;
+let chosen=EXERCISES[0],effort=2,busy=false,summary=null,shownDay=localDay();
+function dateLabel(day){const parts=day.split("-");return Number(parts[1])+"月"+Number(parts[2])+"日";}
 function say(s){$("dialogue").textContent=s}
 function phase(p){for(const name of ["select","guide","record","done"])$(name).classList.toggle("hidden",name!==p);for(const name of ["select","guide","record"])$("nav-"+name).classList.toggle("active",p===name);window.scrollTo({top:0,behavior:"instant"})}
 function renderCards(){const root=$("cards");root.replaceChildren();for(const ex of EXERCISES){const btn=document.createElement("button");btn.className="exercise"+(ex.id===chosen.id?" selected":"");btn.textContent=ex.name;const small=document.createElement("span");small.textContent=ex.category+" / "+ex.tip;btn.append(small);btn.onclick=()=>{chosen=ex;renderCards();say("「"+ex.name+"ですね！一緒に頑張りましょうっ！」")};root.append(btn)}}
@@ -42,7 +44,7 @@ function guide(){phase("guide");$("guideTitle").textContent=chosen.name;$("guide
 function record(){phase("record");$("recordTitle").textContent=chosen.name+"の結果";const prev=summary?.records.find(r=>r.exerciseId===chosen.id);$("amountField").firstChild.textContent=chosen.kind==="reps"?"回数":chosen.kind==="seconds"?"保持時間（秒）":"運動時間（分）";$("weightField").classList.toggle("hidden",!chosen.weight);
 $("amount").value=prev?(prev.reps??prev.duration):(chosen.kind==="minutes"?10:chosen.kind==="seconds"?30:10);$("sets").value=prev?.sets||1;$("kg").value=prev?.weightKg||5;
 $("previous").textContent=prev?"前回："+(prev.reps??prev.duration)+chosen.unit+" × "+prev.sets+"セット":"初めての記録だ！";$("status").textContent="";say("「お疲れさまですっ！結果を教えてくださいね！」")}
-async function refresh(){summary=await readTrainingSummary();$("sp").textContent=summary.sp}
+async function refresh(){summary=await readTrainingSummary();shownDay=summary.today;$("sp").textContent=summary.sp;$("researchDay").textContent=dateLabel(shownDay)}
 $("toGuide").onclick=guide;$("backSelect").onclick=()=>{phase("select");say("「次はどの種目にしましょうか？」")};$("toRecord").onclick=record;$("backGuide").onclick=guide;$("again").onclick=async()=>{await refresh();phase("select");say("「まだ研究するんですか？無理は禁物ですよっ！」")};$("home").onclick=()=>location.assign("./");
 for(const btn of document.querySelectorAll("[data-effort]"))btn.onclick=()=>{effort=Number(btn.dataset.effort);for(const b of document.querySelectorAll("[data-effort]"))b.classList.toggle("selected",b===btn)};
 $("save").onclick=async()=>{if(busy)return;busy=true;$("save").disabled=true;$("status").textContent="";
@@ -50,4 +52,9 @@ try{const result=await saveTraining({exerciseId:chosen.id,amount:$("amount").val
 catch(e){$("status").textContent="保存できませんでした："+e.message}
 finally{busy=false;$("save").disabled=false}};
 try{await refresh();renderCards()}catch(e){$("status").textContent="初期化に失敗しました："+e.message;renderCards()}
+async function onDayChange(){await refresh();if(!$("done").classList.contains("hidden"))return;say("「所長っ！新しい研究日になりましたっ！今日も無理なくいきましょう！」");if(!$("record").classList.contains("hidden"))$("previous").textContent="日付が切り替わりました。記録は保存時点の日付になります。";}
+watchResearchDay(onDayChange);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)onDayChangeIfNeeded()});
+window.addEventListener("pageshow",onDayChangeIfNeeded);
+function onDayChangeIfNeeded(){if(localDay()!==shownDay)onDayChange();else refresh()}
 </script></body></html>
