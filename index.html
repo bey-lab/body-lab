@@ -14,7 +14,7 @@ h1{margin:0;font-size:clamp(24px,3vw,32px)}.muted{color:#657181;line-height:1.6}
 <main><div class="main">
 <section class="hero"><div class="hero-art"><div class="sun">☀️</div><div class="name">明日葉ひなた</div><span class="placeholder">立ち絵スペース・準備中</span></div><div class="speech" id="greeting">「所長っ！今日も一緒に頑張りましょう！」</div></section>
 <section class="actions"><h1>研究所へようこそ！</h1><div class="muted">ちょっと動く日も、身体をいたわる日も。少しずつ研究を積み重ねよう。</div>
-<div class="stats"><div class="stat"><small>今日の記録</small><strong id="today">--</strong></div><div class="stat"><small>活動日数</small><strong id="days">--</strong></div></div>
+<div class="stats"><div class="stat"><small id="todayLabel">今日の記録</small><strong id="today">--</strong></div><div class="stat"><small>活動日数</small><strong id="days">--</strong></div></div>
 <a class="button" href="./training.html">💪 今日のトレーニング</a>
 <div class="small-actions"><a class="button sub" href="./tree.html">🌳 研究ツリー</a><a class="button sub" href="./backup-test.html">🔐 バックアップ</a></div>
 <div class="last"><b>最新の研究記録</b><div id="latest">記録を読み込み中…</div></div>
@@ -22,10 +22,31 @@ h1{margin:0;font-size:clamp(24px,3vw,32px)}.muted{color:#657181;line-height:1.6}
 </section></div>
 <nav class="links"><a href="./storage-test.html">保存テスト</a><a href="./tree-test.html">旧研究ツリー試験</a><a href="./backup-test.html">JSONエクスポート・復元</a></nav></main>
 <script type="module">
-import {readTrainingSummary,findExercise} from "./js/training.js";
+import {readTrainingSummary,findExercise,localDay} from "./js/training.js";
+import {watchResearchDay} from "./js/day-watch.js";
 const $=id=>document.getElementById(id);
-try{const summary=await readTrainingSummary();$("sp").textContent=summary.sp;$("today").textContent=summary.todayRecords.length+" 件";$("days").textContent=summary.activeDays+" 日";
-if(summary.records.length){const last=summary.records[0],ex=findExercise(last.exerciseId);$("latest").textContent=(ex?.name||last.exerciseId)+"："+(last.reps??last.duration)+(ex?.unit||"")+" × "+last.sets+"セット";$("greeting").textContent="「所長っ！今日も研究お疲れさまです！続けているところ、かっこいいですっ！」"}
-else {$("latest").textContent="まだ研究記録がありません。最初の一歩から！"}
-}catch(error){$("latest").textContent="記録を読み込めませんでした："+error.message}
+let shownDay=localDay();
+async function renderHome(newDay=false){
+ try{
+ const summary=await readTrainingSummary();
+ shownDay=summary.today;
+ $("sp").textContent=summary.sp;
+ $("today").textContent=summary.todayRecords.length+" 件";
+ $("todayLabel").textContent="今日の記録";
+ $("days").textContent=summary.activeDays+" 日";
+ if(summary.records.length){
+ const last=summary.records[0],ex=findExercise(last.exerciseId);
+ $("latest").textContent=(ex?.name||last.exerciseId)+"："+(last.reps??last.duration)+(ex?.unit||"")+" × "+last.sets+"セット";
+ }else $("latest").textContent="まだ研究記録がありません。最初の一歩から！";
+ $("greeting").textContent=newDay?
+ "「所長っ！新しい研究日ですっ！昨日の記録はちゃんと残っていますよ。今日も無理せずいきましょう！」":
+ summary.todayRecords.length?
+ "「所長っ！今日も研究お疲れさまです！続けているところ、かっこいいですっ！」":
+ "「所長っ！今日はどんな一日にしましょう？休息も大切な研究ですよっ！」";
+ }catch(error){$("latest").textContent="記録を読み込めませんでした："+error.message}
+}
+await renderHome();
+watchResearchDay(()=>renderHome(true));
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)renderHome(localDay()!==shownDay)});
+window.addEventListener("pageshow",()=>renderHome(localDay()!==shownDay));
 </script></body></html>
