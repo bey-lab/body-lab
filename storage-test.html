@@ -6,7 +6,7 @@
 <title>BODY-LAB 保存テスト</title>
 <style>
 :root{font-family:system-ui,-apple-system,sans-serif;color:#303039;background:#fff9ea}
-body{margin:0;padding:24px 16px;max-width:650px;margin-inline:auto}
+body{margin:0;padding:0 16px 24px}
 h1{font-size:1.6rem;margin-bottom:4px}
 small{color:#65636b}
 section{background:white;padding:20px;border-radius:18px;box-shadow:0 4px 18px #0001;margin:20px 0}
@@ -86,4 +86,5 @@ $("reload").onclick = () => location.reload();
 try {await openBodyLabDB();showStatus("データベース接続OK。保存テストできます");await read()}
 catch(error){showStatus("初期化失敗: "+error.message,true)}
 </script>
+<script type="module" src="./js/navigation.js"></script>
 </body></html>
