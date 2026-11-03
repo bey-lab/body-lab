@@ -9,7 +9,7 @@ export function installNavigation(){
  if(document.querySelector(".bodylab-global-nav"))return;
  const css=document.createElement("style");
  css.textContent=`
-.bodylab-global-nav{box-sizing:border-box;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:10px clamp(12px,3vw,34px);background:#fffef8f5;border-bottom:1px solid #e8dfcc;box-shadow:0 4px 16px #4639180b;font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;color:#293247;width:100%;max-width:none}
+.bodylab-global-nav{box-sizing:border-box;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;padding:10px clamp(12px,3vw,34px);background:#fffef8f5;border-bottom:1px solid #e8dfcc;box-shadow:0 4px 16px #4639180b;font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;color:#293247;width:100vw;max-width:none;margin-left:calc(50% - 50vw)}
 .bodylab-global-nav *, .bodylab-global-nav *::before{box-sizing:border-box}
 .bodylab-nav-brand{font-size:18px;font-weight:950;text-decoration:none;color:#343c50;white-space:nowrap}
 .bodylab-nav-links{display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:thin;min-width:0;flex:1;padding:2px}
