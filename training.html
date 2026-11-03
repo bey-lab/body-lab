@@ -48,6 +48,21 @@ h1{font-size:clamp(23px,3vw,31px);margin:0 0 8px}h2{font-size:clamp(20px,2vw,25p
 .timer-note{font-size:13px;margin-bottom:0}
 @media(min-width:801px){.panel>div:not(.steps):not(.hidden){display:block;flex:1;min-height:0}.panel #select:not(.hidden){display:flex;flex-direction:column}.panel #select .full{margin-top:auto}.panel #workout{overflow-y:auto}.panel #workout .buttons{margin-top:14px;padding-top:0}}
 
+/* v0.3: Stabilize card geometry when switching exercise screens. */
+@media(min-width:801px){
+ .layout{grid-template-columns:minmax(250px,36%) minmax(0,1fr);align-items:start}
+ .character,.panel{height:730px;max-height:730px}
+ .character{grid-template-rows:minmax(0,1fr) 50px 112px}
+ .character-stage{height:100%;min-height:0;max-height:100%}
+ .character .bodylab-assistant-switch{height:50px;min-height:50px;align-items:center;flex-wrap:nowrap}
+ .character .bodylab-assistant-switch button{height:40px;flex:1}
+ .dialogue{height:112px;min-height:112px;max-height:112px}
+ .panel{overflow-y:auto;scrollbar-gutter:stable;contain:layout}
+ .panel #workout{scrollbar-gutter:stable}
+}
+@media(max-width:800px){.panel{min-width:0}}
+
+
 </style></head>
 <body>
 <header><a href="./" class="logo">☀️ BODY-LAB</a><span class="pill"><span id="researchDay"></span>　研究SP <span id="sp">--</span></span></header>
@@ -97,7 +112,8 @@ function phase(p){
  for(const name of ["select","workout","done"])$(name).classList.toggle("hidden",name!==p);
  $("nav-select").classList.toggle("active",p==="select");
  $("nav-guide").classList.toggle("active",p==="workout"||p==="done");
- if(p==="workout")scrollTo({top:0,behavior:"instant"});
+ // Keep the page viewport steady; only reset the right panel when changing views.
+ if(p==="workout"||p==="select")document.querySelector(".panel").scrollTop=0;
 }
 function renderCards(){
  const root=$("cards");root.replaceChildren();
