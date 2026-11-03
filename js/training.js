@@ -12,7 +12,7 @@ export const EXERCISES=[
 ];
 const lookup=new Map(EXERCISES.map(x=>[x.id,x]));
 export function findExercise(id){return lookup.get(id)||null;}
-export function localDay(when=new Date()){return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(when);}
+export function localDay(when=new Date()){const parts=new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(when);const values=Object.fromEntries(parts.filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));return values.year+"-"+values.month+"-"+values.day;}
 export async function readTrainingSummary(profileId=OWNER_ID){
  const [records,ledger]=await Promise.all([getAll(STORES.records),getAll(STORES.spLedger)]);
  const owned=records.filter(x=>x.profileId===profileId&&x.sourceMode==="manual-v1").sort((a,b)=>b.performedAt.localeCompare(a.performedAt));
