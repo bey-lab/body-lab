@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BODY-LAB 研究ツリー</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#262d3f;background:#fff8eb}
+*{box-sizing:border-box}body{max-width:850px;margin:auto;padding:25px 15px 60px}
+h1{font-size:1.6rem;margin:0 0 9px}h2{font-size:1.14rem;margin:0}
+p{line-height:1.65}.muted{color:#666b79;font-size:.88rem}
+header{background:linear-gradient(115deg,#ffdc67,#ffb83e);border-radius:24px;padding:24px;box-shadow:0 6px 20px #df991e22}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.points{background:#fff9;border-radius:15px;padding:10px 15px;text-align:center;font-weight:800;font-size:1.4rem}
+.points small{display:block;font-size:.65rem;font-weight:600}
+section{background:white;border-radius:18px;margin-top:16px;padding:20px;box-shadow:0 6px 23px #00000009}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:12px;margin-top:14px}
+.node{border:1px solid #e1e3e8;border-radius:16px;padding:15px;background:#fafbff}
+.node.done{border:2px solid #e5aa32;background:#fff8df}
+.node.locked{opacity:.88}
+.hero{font-weight:800;font-size:.8rem;color:#626c7f;margin:0 0 7px}
+.hero.hinata{color:#b37806}.hero.analyst{color:#4358a3}.hero.mirei{color:#9a5386}
+.node h3{margin:0 0 8px;font-size:1rem}
+.node p{font-size:.86rem;margin:5px 0 9px}
+button{background:#ffca45;border:0;border-radius:11px;padding:10px 14px;font-size:.92rem;font-weight:750;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+button.done{background:#e6ecef}
+.reveal{background:#fff;padding:10px;border-left:3px solid #e9b12d;font-size:.88rem;line-height:1.7;white-space:pre-wrap}
+.notice{font-size:.88rem;background:#f1f4fa;padding:12px;border-radius:12px}
+#status{font-weight:700;min-height:24px}.error{color:#b52727}.ok{color:#157a49}
+a{color:#3262a8}
+</style></head><body>
+<header><div class="top"><div><h1>🌳 BODY-LAB 研究ツリー</h1><div class="muted">v0.1 / 本番プロフィールの研究ツリー</div></div>
+<div class="points"><small>現在の研究SP</small><span id="sp">--</span></div></div>
+<p style="margin-bottom:0">研究を解放すると、助手たちの会話や資料が読めるようになる！</p></header>
+<section><strong>🔐 保存試験について</strong><p class="muted">手動トレーニングや日々の振り返りで獲得したSPを使います。旧保存テストの5SPとは別です。解放状況はIndexedDBとJSONバックアップに保存されます。</p>
+<p id="status" aria-live="polite">データを読み込み中…</p>
+<button id="reload">データを再読み込み</button></section>
+<section><h2>☀️ 明日葉ひなたの研究</h2><div id="hinata" class="cards"></div></section>
+<section><h2>❄️ クール系助手（仮）の研究</h2><div id="analyst" class="cards"></div></section>
+<section><h2>💜 ミレイの研究</h2><div id="mirei" class="cards"></div></section>
+<section><h2>今後の拡張</h2><p class="muted">衣装・秘密のプロフィール・特別な会話も同じ固定ID方式で追加できる。安全に関わる運動情報はアンロック不要にする。</p>
+<a href="./backup-test.html">バックアップ試験場へ</a>　<a href="./training.html">トレーニングへ</a>　<a href="./">ホームへ</a></section>
+<script type="module">
+import {NODES,readTreeState,purchaseNode} from "./js/tree.js";
+import {OWNER_ID} from "./js/training.js";
+const $=id=>document.getElementById(id);
+const labels={hinata:"☀️ ひなた",analyst:"❄️ 分析担当",mirei:"💜 ミレイ"};
+let working=false;
+function status(message,error=false){$("status").textContent=message;$("status").className=error?"error":"ok";}
+function text(tag,content,className){const element=document.createElement(tag);element.textContent=content;if(className)element.className=className;return element;}
+function nodeCard(node,state){
+ const active=state.unlocked.has(node.id);
+ const ready=node.requires.every(id=>state.unlocked.has(id));
+ const enough=state.balance>=node.cost;
+ const card=document.createElement("div");card.className="node "+(active?"done":"locked");
+ card.append(text("div",labels[node.hero],"hero "+node.hero),text("h3",node.title),text("p",node.summary));
+ const btn=document.createElement("button");
+ btn.textContent=active?"✓ 解放済み":!ready?"🔒 前の研究が必要":node.cost+" SPで解放";
+ btn.disabled=active||!ready||!enough||working;
+ if(!active&&ready&&!enough)btn.textContent="SP不足（必要 "+node.cost+"）";
+ if(active)btn.className="done";
+ btn.onclick=async()=>{if(working)return;working=true;try{
+ const result=await purchaseNode(node.id,OWNER_ID);
+ status(result==="already"?"すでに解放済み。SPは消費されません":"🎉 "+node.title+" を解放しました！");
+ }catch(e){status(e.message,true)}
+ finally{working=false;await render()}
+ };
+ card.append(btn);
+ if(active)card.append(text("div",node.dialogue,"reveal"));
+ return card;
+}
+async function render(){
+ try {
+ const state=await readTreeState();
+ $("sp").textContent=state.balance;
+ for(const hero of ["hinata","analyst","mirei"]){
+ const root=$(hero);root.replaceChildren();
+ for(const node of NODES.filter(x=>x.hero===hero))root.append(nodeCard(node,state));
+ }
+ }catch(e){status("読み込み失敗: "+e.message,true)}
+}
+$("reload").onclick=()=>location.reload();
+try {await render();status("データを読み込みました。研究を選んで試せます。");}
+catch(e){status(e.message,true)}
+</script></body></html>
