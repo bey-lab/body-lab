@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>研究記録 | BODY-LAB</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;background:#fff8eb;color:#293247}*{box-sizing:border-box}body{margin:0}main{max-width:1150px;margin:auto;padding:25px clamp(14px,3vw,36px) 65px}h1{font-size:clamp(27px,3vw,36px);margin:0 0 7px}h2{font-size:22px;margin:0 0 13px}.muted{color:#637185;line-height:1.6}.card{background:#fff;border-radius:22px;padding:clamp(17px,3vw,27px);box-shadow:0 7px 26px #6045230b;margin-top:16px}.overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stat{border-radius:16px;background:#f4f6fa;padding:16px}.stat small{display:block;color:#667284;font-size:14px}.stat strong{font-size:30px}.graph-box{border-radius:14px;background:#f6f8fc;padding:12px 12px 4px;overflow:hidden}#chart{width:100%;height:auto;display:block;min-height:165px}#chart text{font-size:12px;fill:#657389;font-weight:700}.graph-legend{font-size:13px;color:#637185;margin-top:12px}button{font:inherit;cursor:pointer;border:0;border-radius:11px;padding:10px 16px;background:#ebeff6;color:#293247;font-weight:800;min-height:44px}button.active{background:#ffcf55}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}a{color:#3163a2;text-decoration:none;font-weight:800}.day-group{margin-top:12px;border:1px solid #e5e9ee;border-radius:15px;overflow:hidden}.day-group summary{cursor:pointer;list-style:none;padding:15px 17px;font-size:17px;font-weight:900;background:#f6f8fc;display:flex;justify-content:space-between;align-items:center;gap:10px}.day-group summary::-webkit-details-marker{display:none}.day-group summary::after{content:"⌄";color:#6f7e8d}.day-group[open] summary::after{content:"⌃"}.entries{padding:3px 16px 12px}.entry{border-bottom:1px solid #eef0f5;padding:12px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.entry:last-child{border-bottom:0}.entry strong{display:block;font-size:17px}.entry .extra{color:#6e7b8c;font-size:13px;line-height:1.65;margin-top:5px;overflow-wrap:anywhere}.entry time{font-size:13px;color:#7c8794;white-space:nowrap}.empty{padding:25px;text-align:center;color:#687488}.footer{font-size:13px;margin-top:20px;color:#637185}
+@media(max-width:560px){.overview{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.stat{padding:10px}.stat small{font-size:11px}.stat strong{font-size:24px}.card{padding:15px}.day-group summary{font-size:15px}}
+</style></head><body>
+<main>
+<h1>📊 研究記録</h1><p class="muted">所長の実験履歴と「かっこいい度」の育ち方を観察する場所。</p>
+<div class="overview">
+ <div class="stat"><small>今日の記録</small><strong id="todayCount">--</strong></div>
+ <div class="stat"><small>活動日数</small><strong id="activeDays">--</strong></div>
+ <div class="stat"><small>かっこいい度</small><strong id="coolScore">--</strong></div>
+</div>
+<section class="card"><h2>⚡ かっこいい度の推移</h2>
+<p class="muted">継続した日と運動の系統から算出。記録のたびに増えるわけではない、お楽しみ指標だ。</p>
+<div class="graph-box"><svg id="chart" viewBox="0 0 760 235" role="img" aria-label="かっこいい度の累積推移グラフ"><text x="380" y="118" text-anchor="middle">読み込み中…</text></svg></div>
+<div id="chartSummary" class="graph-legend" aria-live="polite"></div>
+</section>
+<section class="card"><h2>📒 トレーニング履歴</h2>
+<div class="controls" aria-label="表示する履歴"><button id="all" class="active" type="button">すべて</button><button id="todayOnly" type="button">今日のみ</button></div>
+<div id="history" aria-live="polite">読み込み中…</div></section>
+<p class="footer">記録はこのブラウザ内の保存データから読み取っています。閲覧だけではデータやSPは変わりません。大切な記録はバックアップも忘れずに。</p>
+</main>
+<script type="module">
+import {readTrainingSummary,findExercise,localDay} from "./js/training.js";
+import {calculateCoolness} from "./js/coolness.js";
+const $=id=>document.getElementById(id);
+const NS="http://www.w3.org/2000/svg";
+let allRecords=[],filter="all";
+function svg(tag,attrs={},text){const n=document.createElementNS(NS,tag);for(const [key,value] of Object.entries(attrs))n.setAttribute(key,String(value));if(text!==undefined)n.textContent=String(text);return n}
+function formatDay(day){const parts=String(day).split("-");return parts.length===3?Number(parts[0])+"年"+Number(parts[1])+"月"+Number(parts[2])+"日":day}
+function formatTime(value){const date=new Date(value);return Number.isNaN(date.getTime())?"":new Intl.DateTimeFormat("ja-JP",{timeZone:"Asia/Tokyo",hour:"2-digit",minute:"2-digit"}).format(date)}
+function drawChart(records){
+ const root=$("chart");root.replaceChildren();
+ const days=[...new Set(records.map(r=>r.localDay).filter(Boolean))].sort();
+ if(!days.length){root.append(svg("text",{x:380,y:120,"text-anchor":"middle"},"まだ記録がありません"));$("chartSummary").textContent="最初の研究記録をつけると、ここに成長の線が描かれるぞ。";return}
+ const points=days.map(day=>({day,score:calculateCoolness(records.filter(r=>r.localDay<=day)).score}));
+ const max=Math.max(20,Math.ceil(points[points.length-1].score/10)*10),left=58,right=733,top=21,bottom=181;
+ const x=i=>points.length===1?(left+right)/2:left+i*(right-left)/(points.length-1);
+ const y=v=>bottom-(v/max)*(bottom-top);
+ for(let i=0;i<=4;i++){const value=Math.round(max*i/4);const py=y(value);root.append(svg("line",{x1:left,y1:py,x2:right,y2:py,stroke:"#dce4ef","stroke-width":1}));root.append(svg("text",{x:left-10,y:py+4,"text-anchor":"end"},value))}
+ const poly=[{x:left,y:bottom},...points.map((p,i)=>({x:x(i),y:y(p.score)})),{x:right,y:bottom}];
+ const line=points.map((p,i)=>x(i)+","+y(p.score)).join(" ");
+ const area="M "+poly.map(p=>p.x+" "+p.y).join(" L ")+" Z";
+ root.append(svg("path",{d:area,fill:"#f9d988",opacity:.42}));
+ if(points.length===1)root.append(svg("line",{x1:left,y1:y(0),x2:x(0),y2:y(points[0].score),stroke:"#d99c22","stroke-width":3,"stroke-dasharray":"5 5"}));
+ else root.append(svg("polyline",{points:line,fill:"none",stroke:"#e4a52e","stroke-width":4,"stroke-linecap":"round","stroke-linejoin":"round"}));
+ for(const [i,p] of points.entries()){
+  root.append(svg("circle",{cx:x(i),cy:y(p.score),r:5,fill:"#e4a52e",stroke:"#fff","stroke-width":2}));
+  const hit=svg("circle",{cx:x(i),cy:y(p.score),r:17,fill:"transparent",tabindex:"0",role:"img","aria-label":formatDay(p.day)+" かっこいい度 "+p.score+"ポイント"});
+  hit.append(svg("title",{},formatDay(p.day)+"："+p.score+"pt"));root.append(hit);
+ }
+ const labels=[0,Math.floor((points.length-1)/2),points.length-1].filter((v,i,a)=>a.indexOf(v)===i);
+ for(const i of labels)root.append(svg("text",{x:x(i),y:211,"text-anchor":"middle"},points[i].day.slice(5).replace("-","/")));
+ $("chartSummary").textContent=days.length+"活動日を表示 · 現在 "+points.at(-1).score+"pt · 1日の同じ系統の記録を増やしても重複加点されません。";
+}
+function renderHistory(){
+ $("all").classList.toggle("active",filter==="all");$("todayOnly").classList.toggle("active",filter==="today");
+ const records=filter==="today"?allRecords.filter(r=>r.localDay===localDay()):allRecords;
+ const root=$("history");root.replaceChildren();
+ if(!records.length){const empty=document.createElement("p");empty.className="empty";empty.textContent=filter==="today"?"今日はまだ記録がありません。":"まだ研究記録がありません。";root.append(empty);return}
+ const grouped=new Map();
+ for(const record of records){const day=record.localDay||"日付不明";if(!grouped.has(day))grouped.set(day,[]);grouped.get(day).push(record)}
+ for(const [day,entries] of grouped){
+  const group=document.createElement("details");group.className="day-group";group.open=filter==="today"||day===[...grouped.keys()][0];
+  const summary=document.createElement("summary");const label=document.createElement("span");label.textContent=formatDay(day);const total=document.createElement("span");total.textContent=entries.length+"件";summary.append(label,total);group.append(summary);
+  const body=document.createElement("div");body.className="entries";
+  for(const record of entries){
+   const ex=findExercise(record.exerciseId),unit=ex?.unit||"",line=document.createElement("div");line.className="entry";
+   const detail=document.createElement("div"),name=document.createElement("strong");name.textContent=ex?.name||record.exerciseId;
+   const amount=record.reps??record.duration;
+   const desc=document.createElement("div");desc.textContent=amount+unit+" × "+(record.sets||1)+"セット"+(record.weightKg?" / "+record.weightKg+"kg":"");
+   const extra=document.createElement("div");extra.className="extra";const efforts={1:"らく",2:"ふつう",3:"きつい"};
+   const notes=[record.effort?"きつさ："+(efforts[record.effort]||"記録済み"):"",record.note?"メモ："+record.note:""].filter(Boolean);extra.textContent=notes.join(" / ");
+   detail.append(name,desc);if(notes.length)detail.append(extra);
+   const when=document.createElement("time");when.textContent=formatTime(record.performedAt);
+   line.append(detail,when);body.append(line);
+  }
+  group.append(body);root.append(group);
+ }
+}
+$("all").onclick=()=>{filter="all";renderHistory()};
+$("todayOnly").onclick=()=>{filter="today";renderHistory()};
+try{
+ const summary=await readTrainingSummary();allRecords=summary.records;
+ $("todayCount").textContent=summary.todayRecords.length+"件";$("activeDays").textContent=summary.activeDays+"日";$("coolScore").textContent=calculateCoolness(allRecords).score+"pt";
+ drawChart(allRecords);filter=new URLSearchParams(location.search).get("view")==="today"?"today":"all";renderHistory();
+}catch(error){$("history").textContent="研究記録を読み込めませんでした："+error.message;$("chartSummary").textContent="読み込みエラー";}
+</script><script type="module" src="./js/navigation.js"></script>
+</body></html>
