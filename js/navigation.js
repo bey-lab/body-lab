@@ -2,6 +2,7 @@
 const LINKS=[
 {path:"./",label:"ホーム",icon:"⌂",key:"home"},
 {path:"./training.html",label:"トレーニング",icon:"💪",key:"training"},
+{path:"./records.html",label:"記録",icon:"📊",key:"records"},
 {path:"./tree.html",label:"研究ツリー",icon:"🌳",key:"tree"},
 {path:"./backup-test.html",label:"バックアップ",icon:"🔐",key:"backup"}
 ];
@@ -23,7 +24,7 @@ export function installNavigation(){
  const title=document.createElement("a");title.href="./";title.className="bodylab-nav-brand";title.textContent="⬡ BODY-LAB";nav.append(title);
  const holder=document.createElement("div");holder.className="bodylab-nav-links";
  const page=location.pathname.split("/").pop()||"index.html";
- const active=page==="index.html"?"home":page==="training.html"?"training":page==="tree.html"?"tree":page==="backup-test.html"?"backup":null;
+ const active=page==="index.html"?"home":page==="training.html"?"training":page==="records.html"?"records":page==="tree.html"?"tree":page==="backup-test.html"?"backup":null;
  for(const link of LINKS){const a=document.createElement("a");a.className="bodylab-nav-link"+(active===link.key?" active":"");a.href=link.path;a.textContent=link.icon+" "+link.label;if(active===link.key)a.setAttribute("aria-current","page");holder.append(a)}
  nav.append(holder);document.body.prepend(nav);
 }
