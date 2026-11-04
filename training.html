@@ -164,7 +164,7 @@ function renderWorkout(){
  }
  $("status").textContent="";tick();phase("workout");say("guide");
 }
-async function refresh(){summary=await readTrainingSummary();shownDay=summary.today;$("sp").textContent=summary.sp;$("researchDay").textContent=dateLabel(shownDay)}
+async function refresh(){summary=await readTrainingSummary();shownDay=localDay();$("sp").textContent=summary.sp;$("researchDay").textContent=dateLabel(shownDay)}
 function saved(result){
  $("resultDetail").textContent=chosen.name+"："+result.amount+chosen.unit+" × "+result.sets+"セット";
  $("earned").textContent="+"+result.earned+" SP";
