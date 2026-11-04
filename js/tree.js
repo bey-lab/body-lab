@@ -397,6 +397,12 @@ export async function readTreeState(profileId=TREE_PROFILE_ID) {
   return {balance,unlocked};
 }
 
+// Read-only unlock history for progress graphs and playful coolness points.
+export async function readTreeUnlocks(profileId=TREE_PROFILE_ID){
+  const unlocks=await getAll(STORES.unlocks);
+  return unlocks.filter(x=>x.profileId===profileId&&NODE_BY_ID.has(x.nodeId));
+}
+
 // All checks and both writes happen inside a single readwrite IndexedDB transaction.
 // Concurrent taps serialize automatically. Duplicate unlocks never spend SP twice.
 export async function purchaseNode(nodeId,profileId=TREE_PROFILE_ID) {
