@@ -3,6 +3,7 @@
 <style>
 :root{font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;background:#fff8e9;color:#293247}*{box-sizing:border-box}body{margin:0}
 header{padding:22px clamp(18px,5vw,58px);display:flex;gap:10px;align-items:center;justify-content:space-between}.brand{font-size:clamp(24px,4vw,33px);font-weight:1000;letter-spacing:.03em}.tagline{color:#7e6b48;font-size:15px;margin:4px 0}.sp{background:#fff;border-radius:18px;padding:13px 20px;font-weight:900;box-shadow:0 5px 19px #5e410c12}
+.header-ident{display:flex;align-items:center;gap:15px;min-width:0}.header-logo{width:92px;height:92px;object-fit:contain;flex-shrink:0;border-radius:16px}.header-ident .brand{font-size:clamp(22px,3vw,30px)}@media(max-width:510px){.header-logo{width:66px;height:66px}.header-ident{gap:8px}header{padding:14px}.sp{padding:10px 12px}.tagline{font-size:12px}}
 main{max-width:1250px;margin:auto;padding:12px clamp(15px,3vw,40px) 42px}.main{display:grid;grid-template-columns:minmax(270px,46%) minmax(0,1fr);gap:20px;min-height:560px}
 .hero{border-radius:27px;background:linear-gradient(145deg,#ffd96b,#fff4cd 70%);display:flex;flex-direction:column;justify-content:space-between;padding:26px;overflow:hidden}
 .hero-art{flex:1;min-height:280px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}.hero-illustration:not([hidden]){display:block}.hero-illustration{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 10px 14px #9b702644)}.hero-art:has(.hero-illustration:not([hidden])) .sun,.hero-art:has(.hero-illustration:not([hidden])) .placeholder,.hero-art:has(.hero-illustration:not([hidden])) .name{display:none}.sun{font-size:clamp(85px,15vw,170px);line-height:1.2}.name{font-size:23px;font-weight:900}.placeholder{color:#997d43;font-size:13px}.speech{background:#fff;border:2px solid #efc75d;border-radius:18px;padding:22px;font-size:clamp(18px,2vw,22px);font-weight:850;line-height:1.65}
@@ -42,7 +43,7 @@ h1{margin:0;font-size:clamp(24px,3vw,32px)}.muted{color:#657181;line-height:1.6}
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#ffcf55">
 </head><body>
-<header><div><div class="brand">☀️ BODY-LAB</div><p class="tagline">不純な動機で、健全な肉体を。</p></div><div class="sp">研究SP <span id="sp">--</span></div></header>
+<header><div class="header-ident"><img class="header-logo" src="./assets/branding/body-lab-logo.png" alt="BODY-LAB 公式ロゴ" width="92" height="92"><div><div class="brand">BODY-LAB</div><p class="tagline">不純な動機で、健全な肉体を。</p></div></div><div class="sp">研究SP <span id="sp">--</span></div></header>
 <main><div class="main">
 <section class="hero"><div class="hero-art"><img class="hero-illustration" src="./assets/characters/hinata.webp" alt="明日葉ヒナタの立ち絵" hidden onload="this.hidden=false" onerror="this.hidden=true"><div class="sun">☀️</div><div class="name">明日葉ヒナタ</div><span class="placeholder">立ち絵スペース・準備中</span></div><div class="speech" id="greeting">「所長っ！今日も一緒に頑張りましょう！」</div></section>
 <section class="actions"><h1>研究所へようこそ！</h1><div class="muted">ちょっと動く日も、身体をいたわる日も。少しずつ研究を積み重ねよう。</div>
