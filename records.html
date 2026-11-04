@@ -13,7 +13,7 @@
  <div class="stat"><small>かっこいい度</small><strong id="coolScore">--</strong></div>
 </div>
 <section class="card"><h2>⚡ かっこいい度の推移</h2>
-<p class="muted">継続した日と運動の系統から算出。記録のたびに増えるわけではない、お楽しみ指標だ。</p>
+<p class="muted">継続した日・運動の系統・研究ツリーの解放から算出。お楽しみ指標だ。</p>
 <div class="graph-box"><svg id="chart" viewBox="0 0 760 235" role="img" aria-label="かっこいい度の累積推移グラフ"><text x="380" y="118" text-anchor="middle">読み込み中…</text></svg></div>
 <div id="chartSummary" class="graph-legend" aria-live="polite"></div>
 </section>
@@ -25,17 +25,20 @@
 <script type="module">
 import {readTrainingSummary,findExercise,localDay} from "./js/training.js";
 import {calculateCoolness} from "./js/coolness.js";
+import {readTreeUnlocks} from "./js/tree.js";
+import {OWNER_ID} from "./js/training.js";
 const $=id=>document.getElementById(id);
 const NS="http://www.w3.org/2000/svg";
 let allRecords=[],filter="all";
 function svg(tag,attrs={},text){const n=document.createElementNS(NS,tag);for(const [key,value] of Object.entries(attrs))n.setAttribute(key,String(value));if(text!==undefined)n.textContent=String(text);return n}
 function formatDay(day){const parts=String(day).split("-");return parts.length===3?Number(parts[0])+"年"+Number(parts[1])+"月"+Number(parts[2])+"日":day}
 function formatTime(value){const date=new Date(value);return Number.isNaN(date.getTime())?"":new Intl.DateTimeFormat("ja-JP",{timeZone:"Asia/Tokyo",hour:"2-digit",minute:"2-digit"}).format(date)}
-function drawChart(records){
+function drawChart(records,unlocks=[]){
  const root=$("chart");root.replaceChildren();
- const days=[...new Set(records.map(r=>r.localDay).filter(Boolean))].sort();
+ const unlockDays=unlocks.map(u=>u.unlockedAt?localDay(new Date(u.unlockedAt)):null).filter(Boolean);
+ const days=[...new Set([...records.map(r=>r.localDay).filter(Boolean),...unlockDays])].sort();
  if(!days.length){root.append(svg("text",{x:380,y:120,"text-anchor":"middle"},"まだ記録がありません"));$("chartSummary").textContent="最初の研究記録をつけると、ここに成長の線が描かれるぞ。";return}
- const points=days.map(day=>({day,score:calculateCoolness(records.filter(r=>r.localDay<=day)).score}));
+ const points=days.map(day=>({day,score:calculateCoolness(records.filter(r=>r.localDay<=day),unlocks.filter(u=>u.unlockedAt&&localDay(new Date(u.unlockedAt))<=day)).score}));
  const max=Math.max(20,Math.ceil(points[points.length-1].score/10)*10),left=58,right=733,top=21,bottom=181;
  const x=i=>points.length===1?(left+right)/2:left+i*(right-left)/(points.length-1);
  const y=v=>bottom-(v/max)*(bottom-top);
@@ -53,7 +56,7 @@ function drawChart(records){
  }
  const labels=[0,Math.floor((points.length-1)/2),points.length-1].filter((v,i,a)=>a.indexOf(v)===i);
  for(const i of labels)root.append(svg("text",{x:x(i),y:211,"text-anchor":"middle"},points[i].day.slice(5).replace("-","/")));
- $("chartSummary").textContent=days.length+"活動日を表示 · 現在 "+points.at(-1).score+"pt · 1日の同じ系統の記録を増やしても重複加点されません。";
+ $("chartSummary").textContent=days.length+"日分の変化 · 現在 "+points.at(-1).score+"pt · 研究1件解放で＋2pt。運動の継続も加点されます。";
 }
 function renderHistory(){
  $("all").classList.toggle("active",filter==="all");$("todayOnly").classList.toggle("active",filter==="today");
@@ -83,9 +86,9 @@ function renderHistory(){
 $("all").onclick=()=>{filter="all";renderHistory()};
 $("todayOnly").onclick=()=>{filter="today";renderHistory()};
 try{
- const summary=await readTrainingSummary();allRecords=summary.records;
- $("todayCount").textContent=summary.todayRecords.length+"件";$("activeDays").textContent=summary.activeDays+"日";$("coolScore").textContent=calculateCoolness(allRecords).score+"pt";
- drawChart(allRecords);filter=new URLSearchParams(location.search).get("view")==="today"?"today":"all";renderHistory();
+ const [summary,unlocks]=await Promise.all([readTrainingSummary(),readTreeUnlocks(OWNER_ID)]);allRecords=summary.records;
+ $("todayCount").textContent=summary.todayRecords.length+"件";$("activeDays").textContent=summary.activeDays+"日";$("coolScore").textContent=calculateCoolness(allRecords,unlocks).score+"pt";
+ drawChart(allRecords,unlocks);filter=new URLSearchParams(location.search).get("view")==="today"?"today":"all";renderHistory();
 }catch(error){$("history").textContent="研究記録を読み込めませんでした："+error.message;$("chartSummary").textContent="読み込みエラー";}
 </script><script type="module" src="./js/navigation.js"></script>
 </body></html>
