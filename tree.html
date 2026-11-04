@@ -22,21 +22,28 @@ section{background:white;border-radius:18px;margin-top:16px;padding:20px;box-sha
 button{background:#ffca45;border:0;border-radius:11px;padding:10px 14px;font-size:.92rem;font-weight:750;cursor:pointer}
 button:disabled{opacity:.5;cursor:default}
 button.done{background:#e6ecef}
-.reveal{background:#fff;padding:10px;border-left:3px solid #e9b12d;font-size:.88rem;line-height:1.7;white-space:pre-wrap}
+.reveal{background:#fff;padding:14px;border-left:3px solid #e9b12d;font-size:.93rem;line-height:1.85;white-space:pre-wrap;border-radius:10px;margin-top:11px}
+.lesson{background:#eaf1ff;padding:12px 14px;margin-top:10px;border-radius:10px;font-size:.88rem;line-height:1.75}
+.chapter{display:inline-block;background:#e9edf6;color:#52617c;padding:4px 9px;border-radius:20px;font-size:.75rem;font-weight:900;margin:0 0 9px}
+.requirement{font-size:.78rem;color:#647187;margin:9px 0}
+.node.done{box-shadow:0 3px 12px #b38a1f13}
+.node button{width:100%}
+@media(min-width:800px){body{max-width:1120px}.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
 .notice{font-size:.88rem;background:#f1f4fa;padding:12px;border-radius:12px}
 #status{font-weight:700;min-height:24px}.error{color:#b52727}.ok{color:#157a49}
 a{color:#3262a8}
 </style></head><body>
-<header><div class="top"><div><h1>🌳 BODY-LAB 研究ツリー</h1><div class="muted">v0.1 / 本番プロフィールの研究ツリー</div></div>
+<header><div class="top"><div><h1>🌳 BODY-LAB 研究ツリー</h1><div class="muted">v0.2 / 3分野・全30研究</div></div>
 <div class="points"><small>現在の研究SP</small><span id="sp">--</span></div></div>
-<p style="margin-bottom:0">研究を解放すると、助手たちの会話や資料が読めるようになる！</p></header>
-<section><strong>🔐 保存試験について</strong><p class="muted">手動トレーニングや日々の振り返りで獲得したSPを使います。旧保存テストの5SPとは別です。解放状況はIndexedDBとJSONバックアップに保存されます。</p>
+<p style="margin-bottom:0">研究を解放して助手たちのイベントを見よう！ 新しい研究1件につき、かっこいい度も＋2pt。</p></header>
+<section><strong>📚 研究のすすめ方</strong><p class="muted">運動で得たSPを使い、前提研究から順に解放します。過去に解放した研究と残高はそのまま引き継ぎます。安全に必要な情報はトレーニング画面でも確認できます。</p>
 <p id="status" aria-live="polite">データを読み込み中…</p>
 <button id="reload">データを再読み込み</button></section>
-<section><h2>☀️ 明日葉ヒナタの研究</h2><div id="hinata" class="cards"></div></section>
-<section><h2>❄️ 御影セナの研究</h2><div id="analyst" class="cards"></div></section>
-<section><h2>💜 九条ミレイの研究</h2><div id="mirei" class="cards"></div></section>
-<section><h2>今後の拡張</h2><p class="muted">衣装・秘密のプロフィール・特別な会話も同じ固定ID方式で追加できる。安全に関わる運動情報はアンロック不要にする。</p>
+<section><h2>☀️ 明日葉ヒナタ — 実践・習慣</h2><p class="muted">動く楽しさ、フォーム、続ける工夫を一緒に発見しよう。</p><div id="hinata" class="cards"></div></section>
+<section><h2>❄️ 御影セナ — 身体の科学・分析</h2><p class="muted">筋肉の仕組み、運動負荷、記録を読む技術を研究しよう。</p><div id="analyst" class="cards"></div></section>
+<section><h2>💜 九条ミレイ — 栄養・休息</h2><p class="muted">食事と睡眠と回復も、かっこよさの大切な材料。</p><div id="mirei" class="cards"></div></section>
+<section><h2>研究所のこれから</h2><p class="muted">会話イベントと研究メモを楽しみながら身体の知識を積み重ねよう。SPと研究解放の記録は従来の保存形式のまま。</p>
 <a href="./backup-test.html">バックアップ試験場へ</a>　<a href="./training.html">トレーニングへ</a>　<a href="./">ホームへ</a></section>
 <script type="module">
 import {NODES,readTreeState,purchaseNode} from "./js/tree.js";
@@ -51,7 +58,9 @@ function nodeCard(node,state){
  const ready=node.requires.every(id=>state.unlocked.has(id));
  const enough=state.balance>=node.cost;
  const card=document.createElement("div");card.className="node "+(active?"done":"locked");
+ if(node.chapter)card.append(text("div",node.chapter,"chapter"));
  card.append(text("div",labels[node.hero],"hero "+node.hero),text("h3",node.title),text("p",node.summary));
+ if(!active&&node.requires.length){const names=node.requires.map(id=>NODES.find(n=>n.id===id)?.title||id);card.append(text("div","前提研究："+names.join("・"),"requirement"));}
  const btn=document.createElement("button");
  btn.textContent=active?"✓ 解放済み":!ready?"🔒 前の研究が必要":node.cost+" SPで解放";
  btn.disabled=active||!ready||!enough||working;
@@ -64,7 +73,7 @@ function nodeCard(node,state){
  finally{working=false;await render()}
  };
  card.append(btn);
- if(active)card.append(text("div",node.dialogue,"reveal"));
+ if(active){card.append(text("div",node.dialogue,"reveal"));if(node.lesson)card.append(text("div","🔬 研究メモ： "+node.lesson,"lesson"));}
  return card;
 }
 async function render(){
