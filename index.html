@@ -60,7 +60,7 @@ h1{margin:0;font-size:clamp(24px,3vw,32px)}.muted{color:#657181;line-height:1.6}
 import {readTrainingSummary,findExercise,localDay} from "./js/training.js";
 import {watchResearchDay} from "./js/day-watch.js";
 import {initAssistants} from "./js/assistants.js";
-import {NODES,readTreeState} from "./js/tree.js";
+import {NODES,readTreeState,readTreeUnlocks} from "./js/tree.js";
 import {OWNER_ID,findExercise as findTrainingExercise} from "./js/training.js";
 import {calculateCoolness} from "./js/coolness.js";
 const $=id=>document.getElementById(id);
@@ -74,10 +74,11 @@ async function renderHome(newDay=false){
  $("today").textContent=summary.todayRecords.length+" 件";
  $("todayLabel").textContent="今日の記録";
  $("days").textContent=summary.activeDays+" 日";
- const cool=calculateCoolness(summary.records);
+ const unlocks=await readTreeUnlocks(OWNER_ID);
+ const cool=calculateCoolness(summary.records,unlocks);
  $("coolness").textContent=cool.score.toLocaleString("ja-JP");
  $("coolRank").textContent="称号： "+cool.rank;
- $("coolDetails").textContent="活動日 "+cool.activeDays+"日 · 種類 "+cool.groupCount+"系統 · バランス "+cool.balanceDays+"日";
+ $("coolDetails").textContent="活動日 "+cool.activeDays+"日 · 種類 "+cool.groupCount+"系統 · バランス "+cool.balanceDays+"日 · 研究 "+cool.researchCount+"件";
  if(summary.records.length){
  const last=summary.records[0],ex=findExercise(last.exerciseId);
  $("latest").textContent=(ex?.name||last.exerciseId)+"："+(last.reps??last.duration)+(ex?.unit||"")+" × "+last.sets+"セット";
