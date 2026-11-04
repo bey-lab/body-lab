@@ -1,0 +1,22 @@
+{
+  "name": "BODY-LAB",
+  "short_name": "BODY-LAB",
+  "description": "不純な動機で、健全な肉体を。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff8eb",
+  "theme_color": "#ffcf55",
+  "icons": [
+    {
+      "src": "./assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
