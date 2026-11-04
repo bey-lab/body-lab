@@ -69,7 +69,7 @@ let shownDay=localDay();
 async function renderHome(newDay=false){
  try{
  const summary=await readTrainingSummary();
- shownDay=summary.today;
+ shownDay=localDay();
  $("sp").textContent=summary.sp;
  $("today").textContent=summary.todayRecords.length+" 件";
  $("todayLabel").textContent="今日の記録";
