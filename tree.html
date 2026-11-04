@@ -33,6 +33,30 @@ button.done{background:#e6ecef}
 .notice{font-size:.88rem;background:#f1f4fa;padding:12px;border-radius:12px}
 #status{font-weight:700;min-height:24px}.error{color:#b52727}.ok{color:#157a49}
 a{color:#3262a8}
+
+.tree-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:22px 0 0;font-weight:900;font-size:1.14rem}
+.tree-toolbar>div{display:flex;gap:8px;flex-wrap:wrap}
+.tree-toolbar button{background:#edf0f6;font-size:.82rem;padding:9px 12px;min-height:42px}
+.hero-section{padding:0;overflow:hidden}
+.tree-branch>summary,.chapter-branch>summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;font-weight:900}
+.tree-branch>summary{padding:20px;font-size:1.17rem}
+.tree-branch>summary::-webkit-details-marker,.chapter-branch>summary::-webkit-details-marker,.event-details>summary::-webkit-details-marker{display:none}
+.tree-branch>summary:before,.chapter-branch>summary:before{content:"▸";color:#a2761d;transition:transform .15s}
+.tree-branch[open]>summary:before,.chapter-branch[open]>summary:before{transform:rotate(90deg)}
+.tree-branch>summary span:first-child,.chapter-branch>summary span:first-child{flex:1}
+.tree-branch>.muted{margin:0 20px 12px}
+.progress{white-space:nowrap;background:#fff0c9;border-radius:99px;padding:6px 10px;font-size:.8rem;color:#7c5c1d}
+.chapter-list{padding:0 16px 20px;display:flex;flex-direction:column;gap:12px}
+.chapter-branch{background:#f6f8fc;border:1px solid #e4eaf2;border-radius:16px;overflow:hidden}
+.chapter-branch>summary{padding:13px 16px}
+.chapter-branch .progress{background:#e5eaf5;color:#53617d}
+.chapter-branch .cards{padding:0 12px 14px;margin:0;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.event-details{margin-top:10px;border-top:1px solid #e3d7b7}
+.event-details>summary{list-style:none;cursor:pointer;font-size:.86rem;font-weight:850;color:#856013;padding:11px 0 2px}
+.event-details>summary:after{content:" ▾"}
+.event-details[open]>summary:after{content:" ▴"}
+.tree-branch summary:focus-visible,.chapter-branch summary:focus-visible,.event-details summary:focus-visible{outline:3px solid #506eb5;outline-offset:-3px;border-radius:9px}
+@media(max-width:560px){.tree-branch>summary{padding:16px 12px;font-size:1.02rem}.chapter-list{padding:0 9px 12px}.chapter-branch>summary{padding:12px 10px}.progress{font-size:.72rem}}
 </style></head><body>
 <header><div class="top"><div><h1>🌳 BODY-LAB 研究ツリー</h1><div class="muted">v0.2 / 3分野・全30研究</div></div>
 <div class="points"><small>現在の研究SP</small><span id="sp">--</span></div></div>
@@ -40,9 +64,10 @@ a{color:#3262a8}
 <section><strong>📚 研究のすすめ方</strong><p class="muted">運動で得たSPを使い、前提研究から順に解放します。過去に解放した研究と残高はそのまま引き継ぎます。安全に必要な情報はトレーニング画面でも確認できます。</p>
 <p id="status" aria-live="polite">データを読み込み中…</p>
 <button id="reload">データを再読み込み</button></section>
-<section><h2>☀️ 明日葉ヒナタ — 実践・習慣</h2><p class="muted">動く楽しさ、フォーム、続ける工夫を一緒に発見しよう。</p><div id="hinata" class="cards"></div></section>
-<section><h2>❄️ 御影セナ — 身体の科学・分析</h2><p class="muted">筋肉の仕組み、運動負荷、記録を読む技術を研究しよう。</p><div id="analyst" class="cards"></div></section>
-<section><h2>💜 九条ミレイ — 栄養・休息</h2><p class="muted">食事と睡眠と回復も、かっこよさの大切な材料。</p><div id="mirei" class="cards"></div></section>
+<div class="tree-toolbar"><strong>🌳 研究マップ</strong><div><button id="expandAll" type="button">すべて展開</button><button id="collapseAll" type="button">すべて閉じる</button></div></div>
+<section class="hero-section"><details class="tree-branch" id="branch-hinata"><summary><span>☀️ 明日葉ヒナタ — 実践・習慣</span><span class="progress" id="count-hinata">-- / 10</span></summary><p class="muted">動く楽しさ、フォーム、続ける工夫を一緒に発見しよう。</p><div id="hinata" class="chapter-list"></div></details></section>
+<section class="hero-section"><details class="tree-branch" id="branch-analyst"><summary><span>❄️ 御影セナ — 身体の科学・分析</span><span class="progress" id="count-analyst">-- / 10</span></summary><p class="muted">筋肉の仕組み、運動負荷、記録を読む技術を研究しよう。</p><div id="analyst" class="chapter-list"></div></details></section>
+<section class="hero-section"><details class="tree-branch" id="branch-mirei"><summary><span>💜 九条ミレイ — 栄養・休息</span><span class="progress" id="count-mirei">-- / 10</span></summary><p class="muted">食事と睡眠と回復も、かっこよさの大切な材料。</p><div id="mirei" class="chapter-list"></div></details></section>
 <section><h2>研究所のこれから</h2><p class="muted">会話イベントと研究メモを楽しみながら身体の知識を積み重ねよう。SPと研究解放の記録は従来の保存形式のまま。</p>
 <a href="./backup-test.html">バックアップ試験場へ</a>　<a href="./training.html">トレーニングへ</a>　<a href="./">ホームへ</a></section>
 <script type="module">
@@ -51,6 +76,14 @@ import {OWNER_ID} from "./js/training.js";
 const $=id=>document.getElementById(id);
 const labels={hinata:"☀️ 明日葉ヒナタ",analyst:"❄️ 御影セナ",mirei:"💜 九条ミレイ"};
 let working=false;
+const OPEN_KEY="body-lab-tree-fold-v1";
+let openState={};
+try{const raw=JSON.parse(localStorage.getItem(OPEN_KEY)||"{}");if(raw&&typeof raw==="object"&&!Array.isArray(raw))openState=raw}catch{}
+function defaultOpen(key){return key==="hero:hinata"||key.endsWith(":入門")||key.endsWith(":基礎")}
+function isOpen(key){return typeof openState[key]==="boolean"?openState[key]:defaultOpen(key)}
+function persistOpen(){try{localStorage.setItem(OPEN_KEY,JSON.stringify(openState))}catch{}}
+function bindFold(el,key){el.dataset.collapseKey=key;el.open=isOpen(key);el.addEventListener("toggle",()=>{openState[key]=el.open;persistOpen()})}
+function foldAll(value){for(const element of document.querySelectorAll("[data-collapse-key]")){openState[element.dataset.collapseKey]=value;element.open=value}persistOpen()}
 function status(message,error=false){$("status").textContent=message;$("status").className=error?"error":"ok";}
 function text(tag,content,className){const element=document.createElement(tag);element.textContent=content;if(className)element.className=className;return element;}
 function nodeCard(node,state){
@@ -69,11 +102,18 @@ function nodeCard(node,state){
  btn.onclick=async()=>{if(working)return;working=true;try{
  const result=await purchaseNode(node.id,OWNER_ID);
  status(result==="already"?"すでに解放済み。SPは消費されません":"🎉 "+node.title+" を解放しました！");
+ if(result!=="already"){openState["event:"+node.id]=true;persistOpen()}
  }catch(e){status(e.message,true)}
  finally{working=false;await render()}
  };
  card.append(btn);
- if(active){card.append(text("div",node.dialogue,"reveal"));if(node.lesson)card.append(text("div","🔬 研究メモ： "+node.lesson,"lesson"));}
+ if(active){
+  const event=document.createElement("details");event.className="event-details";bindFold(event,"event:"+node.id);
+  event.append(text("summary","🎬 イベント・研究メモを見る"));
+  event.append(text("div",node.dialogue,"reveal"));
+  if(node.lesson)event.append(text("div","🔬 研究メモ： "+node.lesson,"lesson"));
+  card.append(event);
+ }
  return card;
 }
 async function render(){
@@ -81,11 +121,27 @@ async function render(){
  const state=await readTreeState(OWNER_ID);
  $("sp").textContent=state.balance;
  for(const hero of ["hinata","analyst","mirei"]){
- const root=$(hero);root.replaceChildren();
- for(const node of NODES.filter(x=>x.hero===hero))root.append(nodeCard(node,state));
+  const heroNodes=NODES.filter(x=>x.hero===hero);
+  $("count-"+hero).textContent=heroNodes.filter(x=>state.unlocked.has(x.id)).length+" / "+heroNodes.length;
+  const root=$(hero);root.replaceChildren();
+  const chapters=[...new Set(heroNodes.map(n=>n.chapter||"入門"))];
+  for(const chapter of chapters){
+   const chapterNodes=heroNodes.filter(n=>(n.chapter||"入門")===chapter);
+   const branch=document.createElement("details");branch.className="chapter-branch";bindFold(branch,"chapter:"+hero+":"+chapter);
+   const heading=document.createElement("summary");
+   heading.append(text("span",chapter==="入門"?"🌱 入門":chapter==="基礎"?"📖 基礎":chapter==="応用"?"🔬 応用":chapter==="習慣"?"🔄 習慣":"⭐ 発展"));
+   heading.append(text("span",chapterNodes.filter(n=>state.unlocked.has(n.id)).length+" / "+chapterNodes.length,"progress"));
+   branch.append(heading);
+   const cards=document.createElement("div");cards.className="cards";
+   for(const node of chapterNodes)cards.append(nodeCard(node,state));
+   branch.append(cards);root.append(branch);
+  }
  }
  }catch(e){status("読み込み失敗: "+e.message,true)}
 }
+for(const hero of ["hinata","analyst","mirei"])bindFold($("branch-"+hero),"hero:"+hero);
+$("expandAll").onclick=()=>foldAll(true);
+$("collapseAll").onclick=()=>foldAll(false);
 $("reload").onclick=()=>location.reload();
 try {await render();status("データを読み込みました。研究を選んで試せます。");}
 catch(e){status(e.message,true)}
