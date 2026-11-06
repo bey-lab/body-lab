@@ -29,3 +29,12 @@ export function installNavigation(){
  nav.append(holder);document.body.prepend(nav);
 }
 installNavigation();
+
+// Install the optional offline app shell after the first successful online load.
+// Workout records continue to live in IndexedDB, not in the Service Worker cache.
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js", {scope: "./"})
+      .catch(error => console.warn("BODY-LAB offline setup failed:", error));
+  });
+}
